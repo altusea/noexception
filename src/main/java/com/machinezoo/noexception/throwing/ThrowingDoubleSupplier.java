@@ -10,7 +10,7 @@ import com.machinezoo.noexception.*;
  * {@code ThrowingDoubleSupplier} is usually implemented by a lambda
  * and passed to {@link CheckedExceptionHandler#fromDoubleSupplier(ThrowingDoubleSupplier)}.
  * See <a href="https://noexception.machinezoo.com/">noexception tutorial</a>.
- * 
+ *
  * @see CheckedExceptionHandler#fromDoubleSupplier(ThrowingDoubleSupplier)
  * @see DoubleSupplier
  */
@@ -18,12 +18,12 @@ import com.machinezoo.noexception.*;
 public interface ThrowingDoubleSupplier {
     /**
      * Variation of {@link DoubleSupplier#getAsDouble()} that allows throwing checked exceptions.
-     * 
+     *
      * @return see {@link DoubleSupplier#getAsDouble()}
-     * @throws Throwable
+     * @throws Exception
      *             if unable to complete
      * @see CheckedExceptionHandler#fromDoubleSupplier(ThrowingDoubleSupplier)
      * @see DoubleSupplier#getAsDouble()
      */
-    double getAsDouble() throws Throwable;
+    double getAsDouble() throws Exception;
 }

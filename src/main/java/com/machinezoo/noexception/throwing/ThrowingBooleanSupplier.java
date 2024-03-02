@@ -10,7 +10,7 @@ import com.machinezoo.noexception.*;
  * {@code ThrowingBooleanSupplier} is usually implemented by a lambda
  * and passed to {@link CheckedExceptionHandler#fromBooleanSupplier(ThrowingBooleanSupplier)}.
  * See <a href="https://noexception.machinezoo.com/">noexception tutorial</a>.
- * 
+ *
  * @see CheckedExceptionHandler#fromBooleanSupplier(ThrowingBooleanSupplier)
  * @see BooleanSupplier
  */
@@ -18,12 +18,12 @@ import com.machinezoo.noexception.*;
 public interface ThrowingBooleanSupplier {
     /**
      * Variation of {@link BooleanSupplier#getAsBoolean()} that allows throwing checked exceptions.
-     * 
+     *
      * @return see {@link BooleanSupplier#getAsBoolean()}
-     * @throws Throwable
+     * @throws Exception
      *             if unable to complete
      * @see CheckedExceptionHandler#fromBooleanSupplier(ThrowingBooleanSupplier)
      * @see BooleanSupplier#getAsBoolean()
      */
-    boolean getAsBoolean() throws Throwable;
+    boolean getAsBoolean() throws Exception;
 }

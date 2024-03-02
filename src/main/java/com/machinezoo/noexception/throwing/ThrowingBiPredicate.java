@@ -10,7 +10,7 @@ import com.machinezoo.noexception.*;
  * {@code ThrowingBiPredicate} is usually implemented by a lambda
  * and passed to {@link CheckedExceptionHandler#fromBiPredicate(ThrowingBiPredicate)}.
  * See <a href="https://noexception.machinezoo.com/">noexception tutorial</a>.
- * 
+ *
  * @param <T>
  *            see {@link BiPredicate}
  * @param <U>
@@ -22,16 +22,16 @@ import com.machinezoo.noexception.*;
 public interface ThrowingBiPredicate<T, U> {
     /**
      * Variation of {@link BiPredicate#test(Object, Object)} that allows throwing checked exceptions.
-     * 
+     *
      * @param t
      *            see {@link BiPredicate#test(Object, Object)}
      * @param u
      *            see {@link BiPredicate#test(Object, Object)}
      * @return see {@link BiPredicate#test(Object, Object)}
-     * @throws Throwable
+     * @throws Exception
      *             if unable to complete
      * @see CheckedExceptionHandler#fromBiPredicate(ThrowingBiPredicate)
      * @see BiPredicate#test(Object, Object)
      */
-    boolean test(T t, U u) throws Throwable;
+    boolean test(T t, U u) throws Exception;
 }

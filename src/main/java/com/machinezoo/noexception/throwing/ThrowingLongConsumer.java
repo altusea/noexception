@@ -10,7 +10,7 @@ import com.machinezoo.noexception.*;
  * {@code ThrowingLongConsumer} is usually implemented by a lambda
  * and passed to {@link CheckedExceptionHandler#fromLongConsumer(ThrowingLongConsumer)}.
  * See <a href="https://noexception.machinezoo.com/">noexception tutorial</a>.
- * 
+ *
  * @see CheckedExceptionHandler#fromLongConsumer(ThrowingLongConsumer)
  * @see LongConsumer
  */
@@ -18,13 +18,13 @@ import com.machinezoo.noexception.*;
 public interface ThrowingLongConsumer {
     /**
      * Variation of {@link LongConsumer#accept(long)} that allows throwing checked exceptions.
-     * 
+     *
      * @param value
      *            see {@link LongConsumer#accept(long)}
-     * @throws Throwable
+     * @throws Exception
      *             if unable to complete
      * @see CheckedExceptionHandler#fromLongConsumer(ThrowingLongConsumer)
      * @see LongConsumer#accept(long)
      */
-    void accept(long value) throws Throwable;
+    void accept(long value) throws Exception;
 }

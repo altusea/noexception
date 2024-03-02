@@ -10,7 +10,7 @@ import com.machinezoo.noexception.*;
  * {@code ThrowingIntSupplier} is usually implemented by a lambda
  * and passed to {@link CheckedExceptionHandler#fromIntSupplier(ThrowingIntSupplier)}.
  * See <a href="https://noexception.machinezoo.com/">noexception tutorial</a>.
- * 
+ *
  * @see CheckedExceptionHandler#fromIntSupplier(ThrowingIntSupplier)
  * @see IntSupplier
  */
@@ -18,12 +18,12 @@ import com.machinezoo.noexception.*;
 public interface ThrowingIntSupplier {
     /**
      * Variation of {@link IntSupplier#getAsInt()} that allows throwing checked exceptions.
-     * 
+     *
      * @return see {@link IntSupplier#getAsInt()}
-     * @throws Throwable
+     * @throws Exception
      *             if unable to complete
      * @see CheckedExceptionHandler#fromIntSupplier(ThrowingIntSupplier)
      * @see IntSupplier#getAsInt()
      */
-    int getAsInt() throws Throwable;
+    int getAsInt() throws Exception;
 }

@@ -10,7 +10,7 @@ import com.machinezoo.noexception.*;
  * {@code ThrowingLongUnaryOperator} is usually implemented by a lambda
  * and passed to {@link CheckedExceptionHandler#fromLongUnaryOperator(ThrowingLongUnaryOperator)}.
  * See <a href="https://noexception.machinezoo.com/">noexception tutorial</a>.
- * 
+ *
  * @see CheckedExceptionHandler#fromLongUnaryOperator(ThrowingLongUnaryOperator)
  * @see LongUnaryOperator
  */
@@ -18,14 +18,14 @@ import com.machinezoo.noexception.*;
 public interface ThrowingLongUnaryOperator {
     /**
      * Variation of {@link LongUnaryOperator#applyAsLong(long)} that allows throwing checked exceptions.
-     * 
+     *
      * @param operand
      *            see {@link LongUnaryOperator#applyAsLong(long)}
      * @return see {@link LongUnaryOperator#applyAsLong(long)}
-     * @throws Throwable
+     * @throws Exception
      *             if unable to complete
      * @see CheckedExceptionHandler#fromLongUnaryOperator(ThrowingLongUnaryOperator)
      * @see LongUnaryOperator#applyAsLong(long)
      */
-    long applyAsLong(long operand) throws Throwable;
+    long applyAsLong(long operand) throws Exception;
 }

@@ -10,7 +10,7 @@ import com.machinezoo.noexception.*;
  * {@code ThrowingFunction} is usually implemented by a lambda
  * and passed to {@link CheckedExceptionHandler#function(ThrowingFunction)}.
  * See <a href="https://noexception.machinezoo.com/">noexception tutorial</a>.
- * 
+ *
  * @param <T>
  *            see {@link Function}
  * @param <R>
@@ -22,14 +22,14 @@ import com.machinezoo.noexception.*;
 public interface ThrowingFunction<T, R> {
     /**
      * Variation of {@link Function#apply(Object)} that allows throwing checked exceptions.
-     * 
+     *
      * @param t
      *            see {@link Function#apply(Object)}
      * @return see {@link Function#apply(Object)}
-     * @throws Throwable
+     * @throws Exception
      *             if unable to complete
      * @see CheckedExceptionHandler#function(ThrowingFunction)
      * @see Function#apply(Object)
      */
-    R apply(T t) throws Throwable;
+    R apply(T t) throws Exception;
 }

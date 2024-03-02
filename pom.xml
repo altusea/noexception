@@ -5,7 +5,7 @@
 
 	<groupId>com.machinezoo.noexception</groupId>
 	<artifactId>noexception</artifactId>
-	<version>1.9.1</version>
+	<version>1.9.1-ex</version>
 
 	<name>NoException</name>
 	<description>Functional programming for exception handlers.</description>
@@ -40,7 +40,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.release>11</maven.compiler.release>
+		<maven.compiler.release>17</maven.compiler.release>
 	</properties>
 
 	<dependencies>

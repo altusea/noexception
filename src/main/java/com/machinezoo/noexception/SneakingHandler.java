@@ -7,7 +7,7 @@ final class SneakingHandler extends CheckedExceptionHandler {
 		return sneak(exception);
 	}
 	@SuppressWarnings("unchecked")
-	static <T extends Throwable> RuntimeException sneak(Throwable exception) throws T {
+	static <T extends Exception> RuntimeException sneak(Exception exception) throws T {
 		throw (T)exception;
 	}
 }

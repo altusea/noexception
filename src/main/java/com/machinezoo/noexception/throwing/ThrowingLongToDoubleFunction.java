@@ -10,7 +10,7 @@ import com.machinezoo.noexception.*;
  * {@code ThrowingLongToDoubleFunction} is usually implemented by a lambda
  * and passed to {@link CheckedExceptionHandler#fromLongToDoubleFunction(ThrowingLongToDoubleFunction)}.
  * See <a href="https://noexception.machinezoo.com/">noexception tutorial</a>.
- * 
+ *
  * @see CheckedExceptionHandler#fromLongToDoubleFunction(ThrowingLongToDoubleFunction)
  * @see LongToDoubleFunction
  */
@@ -18,14 +18,14 @@ import com.machinezoo.noexception.*;
 public interface ThrowingLongToDoubleFunction {
     /**
      * Variation of {@link LongToDoubleFunction#applyAsDouble(long)} that allows throwing checked exceptions.
-     * 
+     *
      * @param value
      *            see {@link LongToDoubleFunction#applyAsDouble(long)}
      * @return see {@link LongToDoubleFunction#applyAsDouble(long)}
-     * @throws Throwable
+     * @throws Exception
      *             if unable to complete
      * @see CheckedExceptionHandler#fromLongToDoubleFunction(ThrowingLongToDoubleFunction)
      * @see LongToDoubleFunction#applyAsDouble(long)
      */
-    double applyAsDouble(long value) throws Throwable;
+    double applyAsDouble(long value) throws Exception;
 }

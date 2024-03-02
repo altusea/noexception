@@ -10,7 +10,7 @@ import com.machinezoo.noexception.*;
  * {@code OptionalBiPredicate} is typically obtained from {@link ExceptionHandler#fromBiPredicate(BiPredicate)},
  * in which case its return value is empty when the underlying {@link BiPredicate} throws an exception.
  * See <a href="https://noexception.machinezoo.com/">noexception tutorial</a>.
- * 
+ *
  * @param <T>
  *            see {@link BiPredicate}
  * @param <U>
@@ -25,7 +25,7 @@ public interface OptionalBiPredicate<T, U> {
      * If this {@code OptionalBiPredicate} is obtained from {@link ExceptionHandler#fromBiPredicate(BiPredicate)},
      * the {@link OptionalBoolean} will be empty only if the underlying {@link BiPredicate} throws.
      * Otherwise the returned {@link OptionalBoolean} just wraps the return value of underlying {@link BiPredicate}.
-     * 
+     *
      * @param t
      *            see {@link BiPredicate#test(Object, Object)}
      * @param u
@@ -40,7 +40,7 @@ public interface OptionalBiPredicate<T, U> {
      * Converts this {@code OptionalBiPredicate} to plain {@link BiPredicate} using default value.
      * The returned {@link BiPredicate} will unwrap present value from the {@link OptionalBoolean} if possible,
      * or return {@code result} if the {@link OptionalBoolean} is empty.
-     * 
+     *
      * @param result
      *            default value to return instead of an empty {@link OptionalBoolean}
      * @return plain {@link BiPredicate} that either unwraps {@link OptionalBoolean} or returns default value
@@ -48,13 +48,13 @@ public interface OptionalBiPredicate<T, U> {
      * @see OptionalBoolean#orElse(boolean)
      */
     default BiPredicate<T, U> orElse(boolean result) {
-        return new DefaultBiPredicate<T, U>(this, result);
+        return new DefaultBiPredicate<>(this, result);
     }
     /**
      * Converts this {@code OptionalBiPredicate} to plain {@link BiPredicate} using fallback {@link BooleanSupplier}.
      * The returned {@link BiPredicate} will unwrap present value from the {@link OptionalBoolean} if possible,
      * or fall back to calling {@code source} if the {@link OptionalBoolean} is empty.
-     * 
+     *
      * @param source
      *            {@link BooleanSupplier} to query for fallback value when {@link OptionalBoolean} is empty
      * @return plain {@link BiPredicate} that either unwraps {@link OptionalBoolean} or falls back to {@code source}
@@ -62,6 +62,6 @@ public interface OptionalBiPredicate<T, U> {
      * @see OptionalBoolean#orElseGet(BooleanSupplier)
      */
     default BiPredicate<T, U> orElseGet(BooleanSupplier source) {
-        return new FallbackBiPredicate<T, U>(this, source);
+        return new FallbackBiPredicate<>(this, source);
     }
 }

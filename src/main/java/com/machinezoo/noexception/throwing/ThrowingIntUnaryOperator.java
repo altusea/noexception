@@ -10,7 +10,7 @@ import com.machinezoo.noexception.*;
  * {@code ThrowingIntUnaryOperator} is usually implemented by a lambda
  * and passed to {@link CheckedExceptionHandler#fromIntUnaryOperator(ThrowingIntUnaryOperator)}.
  * See <a href="https://noexception.machinezoo.com/">noexception tutorial</a>.
- * 
+ *
  * @see CheckedExceptionHandler#fromIntUnaryOperator(ThrowingIntUnaryOperator)
  * @see IntUnaryOperator
  */
@@ -18,14 +18,14 @@ import com.machinezoo.noexception.*;
 public interface ThrowingIntUnaryOperator {
     /**
      * Variation of {@link IntUnaryOperator#applyAsInt(int)} that allows throwing checked exceptions.
-     * 
+     *
      * @param operand
      *            see {@link IntUnaryOperator#applyAsInt(int)}
      * @return see {@link IntUnaryOperator#applyAsInt(int)}
-     * @throws Throwable
+     * @throws Exception
      *             if unable to complete
      * @see CheckedExceptionHandler#fromIntUnaryOperator(ThrowingIntUnaryOperator)
      * @see IntUnaryOperator#applyAsInt(int)
      */
-    int applyAsInt(int operand) throws Throwable;
+    int applyAsInt(int operand) throws Exception;
 }

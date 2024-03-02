@@ -3,7 +3,7 @@ package com.machinezoo.noexception;
 
 final class PropagatingHandler extends ExceptionHandler {
 	@Override
-	public boolean handle(Throwable exception) {
+	public boolean handle(Exception exception) {
 		return false;
 	}
 }

@@ -10,7 +10,7 @@ import com.machinezoo.noexception.*;
  * {@code ThrowingIntBinaryOperator} is usually implemented by a lambda
  * and passed to {@link CheckedExceptionHandler#fromIntBinaryOperator(ThrowingIntBinaryOperator)}.
  * See <a href="https://noexception.machinezoo.com/">noexception tutorial</a>.
- * 
+ *
  * @see CheckedExceptionHandler#fromIntBinaryOperator(ThrowingIntBinaryOperator)
  * @see IntBinaryOperator
  */
@@ -18,16 +18,16 @@ import com.machinezoo.noexception.*;
 public interface ThrowingIntBinaryOperator {
     /**
      * Variation of {@link IntBinaryOperator#applyAsInt(int, int)} that allows throwing checked exceptions.
-     * 
+     *
      * @param left
      *            see {@link IntBinaryOperator#applyAsInt(int, int)}
      * @param right
      *            see {@link IntBinaryOperator#applyAsInt(int, int)}
      * @return see {@link IntBinaryOperator#applyAsInt(int, int)}
-     * @throws Throwable
+     * @throws Exception
      *             if unable to complete
      * @see CheckedExceptionHandler#fromIntBinaryOperator(ThrowingIntBinaryOperator)
      * @see IntBinaryOperator#applyAsInt(int, int)
      */
-    int applyAsInt(int left, int right) throws Throwable;
+    int applyAsInt(int left, int right) throws Exception;
 }

@@ -10,7 +10,7 @@ import com.machinezoo.noexception.*;
  * {@code ThrowingDoubleUnaryOperator} is usually implemented by a lambda
  * and passed to {@link CheckedExceptionHandler#fromDoubleUnaryOperator(ThrowingDoubleUnaryOperator)}.
  * See <a href="https://noexception.machinezoo.com/">noexception tutorial</a>.
- * 
+ *
  * @see CheckedExceptionHandler#fromDoubleUnaryOperator(ThrowingDoubleUnaryOperator)
  * @see DoubleUnaryOperator
  */
@@ -18,14 +18,14 @@ import com.machinezoo.noexception.*;
 public interface ThrowingDoubleUnaryOperator {
     /**
      * Variation of {@link DoubleUnaryOperator#applyAsDouble(double)} that allows throwing checked exceptions.
-     * 
+     *
      * @param operand
      *            see {@link DoubleUnaryOperator#applyAsDouble(double)}
      * @return see {@link DoubleUnaryOperator#applyAsDouble(double)}
-     * @throws Throwable
+     * @throws Exception
      *             if unable to complete
      * @see CheckedExceptionHandler#fromDoubleUnaryOperator(ThrowingDoubleUnaryOperator)
      * @see DoubleUnaryOperator#applyAsDouble(double)
      */
-    double applyAsDouble(double operand) throws Throwable;
+    double applyAsDouble(double operand) throws Exception;
 }

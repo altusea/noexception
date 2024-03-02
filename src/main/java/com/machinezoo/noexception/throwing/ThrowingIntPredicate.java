@@ -10,7 +10,7 @@ import com.machinezoo.noexception.*;
  * {@code ThrowingIntPredicate} is usually implemented by a lambda
  * and passed to {@link CheckedExceptionHandler#fromIntPredicate(ThrowingIntPredicate)}.
  * See <a href="https://noexception.machinezoo.com/">noexception tutorial</a>.
- * 
+ *
  * @see CheckedExceptionHandler#fromIntPredicate(ThrowingIntPredicate)
  * @see IntPredicate
  */
@@ -18,14 +18,14 @@ import com.machinezoo.noexception.*;
 public interface ThrowingIntPredicate {
     /**
      * Variation of {@link IntPredicate#test(int)} that allows throwing checked exceptions.
-     * 
+     *
      * @param value
      *            see {@link IntPredicate#test(int)}
      * @return see {@link IntPredicate#test(int)}
-     * @throws Throwable
+     * @throws Exception
      *             if unable to complete
      * @see CheckedExceptionHandler#fromIntPredicate(ThrowingIntPredicate)
      * @see IntPredicate#test(int)
      */
-    boolean test(int value) throws Throwable;
+    boolean test(int value) throws Exception;
 }

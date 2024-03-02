@@ -10,7 +10,7 @@ import com.machinezoo.noexception.*;
  * {@code ThrowingLongSupplier} is usually implemented by a lambda
  * and passed to {@link CheckedExceptionHandler#fromLongSupplier(ThrowingLongSupplier)}.
  * See <a href="https://noexception.machinezoo.com/">noexception tutorial</a>.
- * 
+ *
  * @see CheckedExceptionHandler#fromLongSupplier(ThrowingLongSupplier)
  * @see LongSupplier
  */
@@ -18,12 +18,12 @@ import com.machinezoo.noexception.*;
 public interface ThrowingLongSupplier {
     /**
      * Variation of {@link LongSupplier#getAsLong()} that allows throwing checked exceptions.
-     * 
+     *
      * @return see {@link LongSupplier#getAsLong()}
-     * @throws Throwable
+     * @throws Exception
      *             if unable to complete
      * @see CheckedExceptionHandler#fromLongSupplier(ThrowingLongSupplier)
      * @see LongSupplier#getAsLong()
      */
-    long getAsLong() throws Throwable;
+    long getAsLong() throws Exception;
 }

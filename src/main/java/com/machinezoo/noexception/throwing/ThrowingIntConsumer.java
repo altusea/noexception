@@ -10,7 +10,7 @@ import com.machinezoo.noexception.*;
  * {@code ThrowingIntConsumer} is usually implemented by a lambda
  * and passed to {@link CheckedExceptionHandler#fromIntConsumer(ThrowingIntConsumer)}.
  * See <a href="https://noexception.machinezoo.com/">noexception tutorial</a>.
- * 
+ *
  * @see CheckedExceptionHandler#fromIntConsumer(ThrowingIntConsumer)
  * @see IntConsumer
  */
@@ -18,13 +18,13 @@ import com.machinezoo.noexception.*;
 public interface ThrowingIntConsumer {
     /**
      * Variation of {@link IntConsumer#accept(int)} that allows throwing checked exceptions.
-     * 
+     *
      * @param value
      *            see {@link IntConsumer#accept(int)}
-     * @throws Throwable
+     * @throws Exception
      *             if unable to complete
      * @see CheckedExceptionHandler#fromIntConsumer(ThrowingIntConsumer)
      * @see IntConsumer#accept(int)
      */
-    void accept(int value) throws Throwable;
+    void accept(int value) throws Exception;
 }

@@ -35,7 +35,7 @@ import com.machinezoo.noexception.throwing.*;
  * Parameterless functional interfaces can be called directly by methods {@link #run(ThrowingRunnable)}, {@link #get(ThrowingSupplier)},
  * and the various {@code getAsX} variants.
  * All methods take throwing versions of standard functional interfaces, for example {@link ThrowingRunnable} or {@link ThrowingSupplier}.
- * 
+ *
  * @see <a href="https://noexception.machinezoo.com/">Tutorial</a>
  * @see #handle(Exception)
  * @see Exceptions
@@ -56,7 +56,7 @@ public abstract class CheckedExceptionHandler {
      * Callers should not pass in {@link RuntimeException} or other unchecked exceptions.
      * This method might erroneously wrap such exceptions as if they are checked exceptions.
      * Methods of this class never pass unchecked exceptions to this method.
-     * 
+     *
      * @param exception
      *            checked exception to convert
      * @return converted unchecked exception
@@ -79,7 +79,7 @@ public abstract class CheckedExceptionHandler {
      * Null {@code runnable} is silently wrapped and causes {@link NullPointerException} when executed.
      * <p>
      * Typical usage: {@code methodTakingRunnable(Exceptions.sneak().runnable(() -> my_throwing_lambda))}
-     * 
+     *
      * @param runnable
      *            the {@link ThrowingRunnable} to be converted, usually a lambda
      * @return converted {@link Runnable} free of checked exceptions
@@ -102,8 +102,6 @@ public abstract class CheckedExceptionHandler {
                 throw exception;
             } catch (Exception exception) {
                 throw handle(exception);
-            } catch (Throwable exception) {
-                throw SneakingHandler.sneak(exception);
             }
         }
     }
@@ -115,7 +113,7 @@ public abstract class CheckedExceptionHandler {
      * Null {@code supplier} is silently wrapped and causes {@link NullPointerException} when executed.
      * <p>
      * Typical usage: {@code methodTakingSupplier(Exceptions.sneak().supplier(() -> my_throwing_lambda))}
-     * 
+     *
      * @param <T>
      *            see {@link Supplier}
      * @param supplier
@@ -125,7 +123,7 @@ public abstract class CheckedExceptionHandler {
      * @see Exceptions
      */
     public final <T> Supplier<T> supplier(ThrowingSupplier<T> supplier) {
-        return new CheckedSupplier<T>(supplier);
+        return new CheckedSupplier<>(supplier);
     }
     private final class CheckedSupplier<T> implements Supplier<T> {
         private final ThrowingSupplier<T> supplier;
@@ -140,8 +138,6 @@ public abstract class CheckedExceptionHandler {
                 throw exception;
             } catch (Exception exception) {
                 throw handle(exception);
-            } catch (Throwable exception) {
-                throw SneakingHandler.sneak(exception);
             }
         }
     }
@@ -153,7 +149,7 @@ public abstract class CheckedExceptionHandler {
      * Null {@code supplier} is silently wrapped and causes {@link NullPointerException} when executed.
      * <p>
      * Typical usage: {@code methodTakingIntSupplier(Exceptions.sneak().fromIntSupplier(() -> my_throwing_lambda))}
-     * 
+     *
      * @param supplier
      *            the {@link ThrowingIntSupplier} to be converted, usually a lambda
      * @return converted {@link IntSupplier} free of checked exceptions
@@ -176,8 +172,6 @@ public abstract class CheckedExceptionHandler {
                 throw exception;
             } catch (Exception exception) {
                 throw handle(exception);
-            } catch (Throwable exception) {
-                throw SneakingHandler.sneak(exception);
             }
         }
     }
@@ -189,7 +183,7 @@ public abstract class CheckedExceptionHandler {
      * Null {@code supplier} is silently wrapped and causes {@link NullPointerException} when executed.
      * <p>
      * Typical usage: {@code methodTakingLongSupplier(Exceptions.sneak().fromLongSupplier(() -> my_throwing_lambda))}
-     * 
+     *
      * @param supplier
      *            the {@link ThrowingLongSupplier} to be converted, usually a lambda
      * @return converted {@link LongSupplier} free of checked exceptions
@@ -212,8 +206,6 @@ public abstract class CheckedExceptionHandler {
                 throw exception;
             } catch (Exception exception) {
                 throw handle(exception);
-            } catch (Throwable exception) {
-                throw SneakingHandler.sneak(exception);
             }
         }
     }
@@ -225,7 +217,7 @@ public abstract class CheckedExceptionHandler {
      * Null {@code supplier} is silently wrapped and causes {@link NullPointerException} when executed.
      * <p>
      * Typical usage: {@code methodTakingDoubleSupplier(Exceptions.sneak().fromDoubleSupplier(() -> my_throwing_lambda))}
-     * 
+     *
      * @param supplier
      *            the {@link ThrowingDoubleSupplier} to be converted, usually a lambda
      * @return converted {@link DoubleSupplier} free of checked exceptions
@@ -248,8 +240,6 @@ public abstract class CheckedExceptionHandler {
                 throw exception;
             } catch (Exception exception) {
                 throw handle(exception);
-            } catch (Throwable exception) {
-                throw SneakingHandler.sneak(exception);
             }
         }
     }
@@ -261,7 +251,7 @@ public abstract class CheckedExceptionHandler {
      * Null {@code supplier} is silently wrapped and causes {@link NullPointerException} when executed.
      * <p>
      * Typical usage: {@code methodTakingBooleanSupplier(Exceptions.sneak().fromBooleanSupplier(() -> my_throwing_lambda))}
-     * 
+     *
      * @param supplier
      *            the {@link ThrowingBooleanSupplier} to be converted, usually a lambda
      * @return converted {@link BooleanSupplier} free of checked exceptions
@@ -284,8 +274,6 @@ public abstract class CheckedExceptionHandler {
                 throw exception;
             } catch (Exception exception) {
                 throw handle(exception);
-            } catch (Throwable exception) {
-                throw SneakingHandler.sneak(exception);
             }
         }
     }
@@ -297,7 +285,7 @@ public abstract class CheckedExceptionHandler {
      * Null {@code consumer} is silently wrapped and causes {@link NullPointerException} when executed.
      * <p>
      * Typical usage: {@code methodTakingConsumer(Exceptions.sneak().consumer(t -> my_throwing_lambda))}
-     * 
+     *
      * @param <T>
      *            see {@link Consumer}
      * @param consumer
@@ -307,7 +295,7 @@ public abstract class CheckedExceptionHandler {
      * @see Exceptions
      */
     public final <T> Consumer<T> consumer(ThrowingConsumer<T> consumer) {
-        return new CheckedConsumer<T>(consumer);
+        return new CheckedConsumer<>(consumer);
     }
     private final class CheckedConsumer<T> implements Consumer<T> {
         private final ThrowingConsumer<T> consumer;
@@ -322,8 +310,6 @@ public abstract class CheckedExceptionHandler {
                 throw exception;
             } catch (Exception exception) {
                 throw handle(exception);
-            } catch (Throwable exception) {
-                throw SneakingHandler.sneak(exception);
             }
         }
     }
@@ -335,7 +321,7 @@ public abstract class CheckedExceptionHandler {
      * Null {@code consumer} is silently wrapped and causes {@link NullPointerException} when executed.
      * <p>
      * Typical usage: {@code methodTakingIntConsumer(Exceptions.sneak().fromIntConsumer(v -> my_throwing_lambda))}
-     * 
+     *
      * @param consumer
      *            the {@link ThrowingIntConsumer} to be converted, usually a lambda
      * @return converted {@link IntConsumer} free of checked exceptions
@@ -358,8 +344,6 @@ public abstract class CheckedExceptionHandler {
                 throw exception;
             } catch (Exception exception) {
                 throw handle(exception);
-            } catch (Throwable exception) {
-                throw SneakingHandler.sneak(exception);
             }
         }
     }
@@ -371,7 +355,7 @@ public abstract class CheckedExceptionHandler {
      * Null {@code consumer} is silently wrapped and causes {@link NullPointerException} when executed.
      * <p>
      * Typical usage: {@code methodTakingLongConsumer(Exceptions.sneak().fromLongConsumer(v -> my_throwing_lambda))}
-     * 
+     *
      * @param consumer
      *            the {@link ThrowingLongConsumer} to be converted, usually a lambda
      * @return converted {@link LongConsumer} free of checked exceptions
@@ -394,8 +378,6 @@ public abstract class CheckedExceptionHandler {
                 throw exception;
             } catch (Exception exception) {
                 throw handle(exception);
-            } catch (Throwable exception) {
-                throw SneakingHandler.sneak(exception);
             }
         }
     }
@@ -407,7 +389,7 @@ public abstract class CheckedExceptionHandler {
      * Null {@code consumer} is silently wrapped and causes {@link NullPointerException} when executed.
      * <p>
      * Typical usage: {@code methodTakingDoubleConsumer(Exceptions.sneak().fromDoubleConsumer(v -> my_throwing_lambda))}
-     * 
+     *
      * @param consumer
      *            the {@link ThrowingDoubleConsumer} to be converted, usually a lambda
      * @return converted {@link DoubleConsumer} free of checked exceptions
@@ -430,8 +412,6 @@ public abstract class CheckedExceptionHandler {
                 throw exception;
             } catch (Exception exception) {
                 throw handle(exception);
-            } catch (Throwable exception) {
-                throw SneakingHandler.sneak(exception);
             }
         }
     }
@@ -443,7 +423,7 @@ public abstract class CheckedExceptionHandler {
      * Null {@code consumer} is silently wrapped and causes {@link NullPointerException} when executed.
      * <p>
      * Typical usage: {@code methodTakingBiConsumer(Exceptions.sneak().fromBiConsumer((t, u) -> my_throwing_lambda))}
-     * 
+     *
      * @param <T>
      *            see {@link BiConsumer}
      * @param <U>
@@ -455,7 +435,7 @@ public abstract class CheckedExceptionHandler {
      * @see Exceptions
      */
     public final <T, U> BiConsumer<T, U> fromBiConsumer(ThrowingBiConsumer<T, U> consumer) {
-        return new CheckedBiConsumer<T, U>(consumer);
+        return new CheckedBiConsumer<>(consumer);
     }
     private final class CheckedBiConsumer<T, U> implements BiConsumer<T, U> {
         private final ThrowingBiConsumer<T, U> consumer;
@@ -470,8 +450,6 @@ public abstract class CheckedExceptionHandler {
                 throw exception;
             } catch (Exception exception) {
                 throw handle(exception);
-            } catch (Throwable exception) {
-                throw SneakingHandler.sneak(exception);
             }
         }
     }
@@ -483,7 +461,7 @@ public abstract class CheckedExceptionHandler {
      * Null {@code consumer} is silently wrapped and causes {@link NullPointerException} when executed.
      * <p>
      * Typical usage: {@code methodTakingObjIntConsumer(Exceptions.sneak().fromObjIntConsumer((t, v) -> my_throwing_lambda))}
-     * 
+     *
      * @param <T>
      *            see {@link ObjIntConsumer}
      * @param consumer
@@ -493,7 +471,7 @@ public abstract class CheckedExceptionHandler {
      * @see Exceptions
      */
     public final <T> ObjIntConsumer<T> fromObjIntConsumer(ThrowingObjIntConsumer<T> consumer) {
-        return new CheckedObjIntConsumer<T>(consumer);
+        return new CheckedObjIntConsumer<>(consumer);
     }
     private final class CheckedObjIntConsumer<T> implements ObjIntConsumer<T> {
         private final ThrowingObjIntConsumer<T> consumer;
@@ -508,8 +486,6 @@ public abstract class CheckedExceptionHandler {
                 throw exception;
             } catch (Exception exception) {
                 throw handle(exception);
-            } catch (Throwable exception) {
-                throw SneakingHandler.sneak(exception);
             }
         }
     }
@@ -521,7 +497,7 @@ public abstract class CheckedExceptionHandler {
      * Null {@code consumer} is silently wrapped and causes {@link NullPointerException} when executed.
      * <p>
      * Typical usage: {@code methodTakingObjLongConsumer(Exceptions.sneak().fromObjLongConsumer((t, v) -> my_throwing_lambda))}
-     * 
+     *
      * @param <T>
      *            see {@link ObjLongConsumer}
      * @param consumer
@@ -531,7 +507,7 @@ public abstract class CheckedExceptionHandler {
      * @see Exceptions
      */
     public final <T> ObjLongConsumer<T> fromObjLongConsumer(ThrowingObjLongConsumer<T> consumer) {
-        return new CheckedObjLongConsumer<T>(consumer);
+        return new CheckedObjLongConsumer<>(consumer);
     }
     private final class CheckedObjLongConsumer<T> implements ObjLongConsumer<T> {
         private final ThrowingObjLongConsumer<T> consumer;
@@ -546,8 +522,6 @@ public abstract class CheckedExceptionHandler {
                 throw exception;
             } catch (Exception exception) {
                 throw handle(exception);
-            } catch (Throwable exception) {
-                throw SneakingHandler.sneak(exception);
             }
         }
     }
@@ -559,7 +533,7 @@ public abstract class CheckedExceptionHandler {
      * Null {@code consumer} is silently wrapped and causes {@link NullPointerException} when executed.
      * <p>
      * Typical usage: {@code methodTakingObjDoubleConsumer(Exceptions.sneak().fromObjDoubleConsumer((t, v) -> my_throwing_lambda))}
-     * 
+     *
      * @param <T>
      *            see {@link ObjDoubleConsumer}
      * @param consumer
@@ -569,7 +543,7 @@ public abstract class CheckedExceptionHandler {
      * @see Exceptions
      */
     public final <T> ObjDoubleConsumer<T> fromObjDoubleConsumer(ThrowingObjDoubleConsumer<T> consumer) {
-        return new CheckedObjDoubleConsumer<T>(consumer);
+        return new CheckedObjDoubleConsumer<>(consumer);
     }
     private final class CheckedObjDoubleConsumer<T> implements ObjDoubleConsumer<T> {
         private final ThrowingObjDoubleConsumer<T> consumer;
@@ -584,8 +558,6 @@ public abstract class CheckedExceptionHandler {
                 throw exception;
             } catch (Exception exception) {
                 throw handle(exception);
-            } catch (Throwable exception) {
-                throw SneakingHandler.sneak(exception);
             }
         }
     }
@@ -597,7 +569,7 @@ public abstract class CheckedExceptionHandler {
      * Null {@code predicate} is silently wrapped and causes {@link NullPointerException} when executed.
      * <p>
      * Typical usage: {@code methodTakingPredicate(Exceptions.sneak().predicate(t -> my_throwing_lambda))}
-     * 
+     *
      * @param <T>
      *            see {@link Predicate}
      * @param predicate
@@ -607,7 +579,7 @@ public abstract class CheckedExceptionHandler {
      * @see Exceptions
      */
     public final <T> Predicate<T> predicate(ThrowingPredicate<T> predicate) {
-        return new CheckedPredicate<T>(predicate);
+        return new CheckedPredicate<>(predicate);
     }
     private final class CheckedPredicate<T> implements Predicate<T> {
         private final ThrowingPredicate<T> predicate;
@@ -622,8 +594,6 @@ public abstract class CheckedExceptionHandler {
                 throw exception;
             } catch (Exception exception) {
                 throw handle(exception);
-            } catch (Throwable exception) {
-                throw SneakingHandler.sneak(exception);
             }
         }
     }
@@ -635,7 +605,7 @@ public abstract class CheckedExceptionHandler {
      * Null {@code predicate} is silently wrapped and causes {@link NullPointerException} when executed.
      * <p>
      * Typical usage: {@code methodTakingIntPredicate(Exceptions.sneak().fromIntPredicate(v -> my_throwing_lambda))}
-     * 
+     *
      * @param predicate
      *            the {@link ThrowingIntPredicate} to be converted, usually a lambda
      * @return converted {@link IntPredicate} free of checked exceptions
@@ -658,8 +628,6 @@ public abstract class CheckedExceptionHandler {
                 throw exception;
             } catch (Exception exception) {
                 throw handle(exception);
-            } catch (Throwable exception) {
-                throw SneakingHandler.sneak(exception);
             }
         }
     }
@@ -671,7 +639,7 @@ public abstract class CheckedExceptionHandler {
      * Null {@code predicate} is silently wrapped and causes {@link NullPointerException} when executed.
      * <p>
      * Typical usage: {@code methodTakingLongPredicate(Exceptions.sneak().fromLongPredicate(v -> my_throwing_lambda))}
-     * 
+     *
      * @param predicate
      *            the {@link ThrowingLongPredicate} to be converted, usually a lambda
      * @return converted {@link LongPredicate} free of checked exceptions
@@ -694,8 +662,6 @@ public abstract class CheckedExceptionHandler {
                 throw exception;
             } catch (Exception exception) {
                 throw handle(exception);
-            } catch (Throwable exception) {
-                throw SneakingHandler.sneak(exception);
             }
         }
     }
@@ -707,7 +673,7 @@ public abstract class CheckedExceptionHandler {
      * Null {@code predicate} is silently wrapped and causes {@link NullPointerException} when executed.
      * <p>
      * Typical usage: {@code methodTakingDoublePredicate(Exceptions.sneak().fromDoublePredicate(v -> my_throwing_lambda))}
-     * 
+     *
      * @param predicate
      *            the {@link ThrowingDoublePredicate} to be converted, usually a lambda
      * @return converted {@link DoublePredicate} free of checked exceptions
@@ -730,8 +696,6 @@ public abstract class CheckedExceptionHandler {
                 throw exception;
             } catch (Exception exception) {
                 throw handle(exception);
-            } catch (Throwable exception) {
-                throw SneakingHandler.sneak(exception);
             }
         }
     }
@@ -743,7 +707,7 @@ public abstract class CheckedExceptionHandler {
      * Null {@code predicate} is silently wrapped and causes {@link NullPointerException} when executed.
      * <p>
      * Typical usage: {@code methodTakingBiPredicate(Exceptions.sneak().fromBiPredicate((t, u) -> my_throwing_lambda))}
-     * 
+     *
      * @param <T>
      *            see {@link BiPredicate}
      * @param <U>
@@ -755,7 +719,7 @@ public abstract class CheckedExceptionHandler {
      * @see Exceptions
      */
     public final <T, U> BiPredicate<T, U> fromBiPredicate(ThrowingBiPredicate<T, U> predicate) {
-        return new CheckedBiPredicate<T, U>(predicate);
+        return new CheckedBiPredicate<>(predicate);
     }
     private final class CheckedBiPredicate<T, U> implements BiPredicate<T, U> {
         private final ThrowingBiPredicate<T, U> predicate;
@@ -770,8 +734,6 @@ public abstract class CheckedExceptionHandler {
                 throw exception;
             } catch (Exception exception) {
                 throw handle(exception);
-            } catch (Throwable exception) {
-                throw SneakingHandler.sneak(exception);
             }
         }
     }
@@ -783,7 +745,7 @@ public abstract class CheckedExceptionHandler {
      * Null {@code function} is silently wrapped and causes {@link NullPointerException} when executed.
      * <p>
      * Typical usage: {@code methodTakingFunction(Exceptions.sneak().function(t -> my_throwing_lambda))}
-     * 
+     *
      * @param <T>
      *            see {@link Function}
      * @param <R>
@@ -795,7 +757,7 @@ public abstract class CheckedExceptionHandler {
      * @see Exceptions
      */
     public final <T, R> Function<T, R> function(ThrowingFunction<T, R> function) {
-        return new CheckedFunction<T, R>(function);
+        return new CheckedFunction<>(function);
     }
     private final class CheckedFunction<T, R> implements Function<T, R> {
         private final ThrowingFunction<T, R> function;
@@ -810,8 +772,6 @@ public abstract class CheckedExceptionHandler {
                 throw exception;
             } catch (Exception exception) {
                 throw handle(exception);
-            } catch (Throwable exception) {
-                throw SneakingHandler.sneak(exception);
             }
         }
     }
@@ -823,7 +783,7 @@ public abstract class CheckedExceptionHandler {
      * Null {@code function} is silently wrapped and causes {@link NullPointerException} when executed.
      * <p>
      * Typical usage: {@code methodTakingToIntFunction(Exceptions.sneak().fromToIntFunction(v -> my_throwing_lambda))}
-     * 
+     *
      * @param <T>
      *            see {@link ToIntFunction}
      * @param function
@@ -833,7 +793,7 @@ public abstract class CheckedExceptionHandler {
      * @see Exceptions
      */
     public final <T> ToIntFunction<T> fromToIntFunction(ThrowingToIntFunction<T> function) {
-        return new CheckedToIntFunction<T>(function);
+        return new CheckedToIntFunction<>(function);
     }
     private final class CheckedToIntFunction<T> implements ToIntFunction<T> {
         private final ThrowingToIntFunction<T> function;
@@ -848,8 +808,6 @@ public abstract class CheckedExceptionHandler {
                 throw exception;
             } catch (Exception exception) {
                 throw handle(exception);
-            } catch (Throwable exception) {
-                throw SneakingHandler.sneak(exception);
             }
         }
     }
@@ -861,7 +819,7 @@ public abstract class CheckedExceptionHandler {
      * Null {@code function} is silently wrapped and causes {@link NullPointerException} when executed.
      * <p>
      * Typical usage: {@code methodTakingIntFunction(Exceptions.sneak().fromIntFunction(v -> my_throwing_lambda))}
-     * 
+     *
      * @param <R>
      *            see {@link IntFunction}
      * @param function
@@ -871,7 +829,7 @@ public abstract class CheckedExceptionHandler {
      * @see Exceptions
      */
     public final <R> IntFunction<R> fromIntFunction(ThrowingIntFunction<R> function) {
-        return new CheckedIntFunction<R>(function);
+        return new CheckedIntFunction<>(function);
     }
     private final class CheckedIntFunction<R> implements IntFunction<R> {
         private final ThrowingIntFunction<R> function;
@@ -886,8 +844,6 @@ public abstract class CheckedExceptionHandler {
                 throw exception;
             } catch (Exception exception) {
                 throw handle(exception);
-            } catch (Throwable exception) {
-                throw SneakingHandler.sneak(exception);
             }
         }
     }
@@ -899,7 +855,7 @@ public abstract class CheckedExceptionHandler {
      * Null {@code function} is silently wrapped and causes {@link NullPointerException} when executed.
      * <p>
      * Typical usage: {@code methodTakingIntToLongFunction(Exceptions.sneak().fromIntToLongFunction(v -> my_throwing_lambda))}
-     * 
+     *
      * @param function
      *            the {@link ThrowingIntToLongFunction} to be converted, usually a lambda
      * @return converted {@link IntToLongFunction} free of checked exceptions
@@ -922,8 +878,6 @@ public abstract class CheckedExceptionHandler {
                 throw exception;
             } catch (Exception exception) {
                 throw handle(exception);
-            } catch (Throwable exception) {
-                throw SneakingHandler.sneak(exception);
             }
         }
     }
@@ -935,7 +889,7 @@ public abstract class CheckedExceptionHandler {
      * Null {@code function} is silently wrapped and causes {@link NullPointerException} when executed.
      * <p>
      * Typical usage: {@code methodTakingIntToDoubleFunction(Exceptions.sneak().fromIntToDoubleFunction(v -> my_throwing_lambda))}
-     * 
+     *
      * @param function
      *            the {@link ThrowingIntToDoubleFunction} to be converted, usually a lambda
      * @return converted {@link IntToDoubleFunction} free of checked exceptions
@@ -958,8 +912,6 @@ public abstract class CheckedExceptionHandler {
                 throw exception;
             } catch (Exception exception) {
                 throw handle(exception);
-            } catch (Throwable exception) {
-                throw SneakingHandler.sneak(exception);
             }
         }
     }
@@ -971,7 +923,7 @@ public abstract class CheckedExceptionHandler {
      * Null {@code function} is silently wrapped and causes {@link NullPointerException} when executed.
      * <p>
      * Typical usage: {@code methodTakingToLongFunction(Exceptions.sneak().fromToLongFunction(v -> my_throwing_lambda))}
-     * 
+     *
      * @param <T>
      *            see {@link ToLongFunction}
      * @param function
@@ -981,7 +933,7 @@ public abstract class CheckedExceptionHandler {
      * @see Exceptions
      */
     public final <T> ToLongFunction<T> fromToLongFunction(ThrowingToLongFunction<T> function) {
-        return new CheckedToLongFunction<T>(function);
+        return new CheckedToLongFunction<>(function);
     }
     private final class CheckedToLongFunction<T> implements ToLongFunction<T> {
         private final ThrowingToLongFunction<T> function;
@@ -996,8 +948,6 @@ public abstract class CheckedExceptionHandler {
                 throw exception;
             } catch (Exception exception) {
                 throw handle(exception);
-            } catch (Throwable exception) {
-                throw SneakingHandler.sneak(exception);
             }
         }
     }
@@ -1009,7 +959,7 @@ public abstract class CheckedExceptionHandler {
      * Null {@code function} is silently wrapped and causes {@link NullPointerException} when executed.
      * <p>
      * Typical usage: {@code methodTakingLongFunction(Exceptions.sneak().fromLongFunction(v -> my_throwing_lambda))}
-     * 
+     *
      * @param <R>
      *            see {@link LongFunction}
      * @param function
@@ -1019,7 +969,7 @@ public abstract class CheckedExceptionHandler {
      * @see Exceptions
      */
     public final <R> LongFunction<R> fromLongFunction(ThrowingLongFunction<R> function) {
-        return new CheckedLongFunction<R>(function);
+        return new CheckedLongFunction<>(function);
     }
     private final class CheckedLongFunction<R> implements LongFunction<R> {
         private final ThrowingLongFunction<R> function;
@@ -1034,8 +984,6 @@ public abstract class CheckedExceptionHandler {
                 throw exception;
             } catch (Exception exception) {
                 throw handle(exception);
-            } catch (Throwable exception) {
-                throw SneakingHandler.sneak(exception);
             }
         }
     }
@@ -1047,7 +995,7 @@ public abstract class CheckedExceptionHandler {
      * Null {@code function} is silently wrapped and causes {@link NullPointerException} when executed.
      * <p>
      * Typical usage: {@code methodTakingLongToIntFunction(Exceptions.sneak().fromLongToIntFunction(v -> my_throwing_lambda))}
-     * 
+     *
      * @param function
      *            the {@link ThrowingLongToIntFunction} to be converted, usually a lambda
      * @return converted {@link LongToIntFunction} free of checked exceptions
@@ -1070,8 +1018,6 @@ public abstract class CheckedExceptionHandler {
                 throw exception;
             } catch (Exception exception) {
                 throw handle(exception);
-            } catch (Throwable exception) {
-                throw SneakingHandler.sneak(exception);
             }
         }
     }
@@ -1083,7 +1029,7 @@ public abstract class CheckedExceptionHandler {
      * Null {@code function} is silently wrapped and causes {@link NullPointerException} when executed.
      * <p>
      * Typical usage: {@code methodTakingLongToDoubleFunction(Exceptions.sneak().fromLongToDoubleFunction(v -> my_throwing_lambda))}
-     * 
+     *
      * @param function
      *            the {@link ThrowingLongToDoubleFunction} to be converted, usually a lambda
      * @return converted {@link LongToDoubleFunction} free of checked exceptions
@@ -1106,8 +1052,6 @@ public abstract class CheckedExceptionHandler {
                 throw exception;
             } catch (Exception exception) {
                 throw handle(exception);
-            } catch (Throwable exception) {
-                throw SneakingHandler.sneak(exception);
             }
         }
     }
@@ -1119,7 +1063,7 @@ public abstract class CheckedExceptionHandler {
      * Null {@code function} is silently wrapped and causes {@link NullPointerException} when executed.
      * <p>
      * Typical usage: {@code methodTakingToDoubleFunction(Exceptions.sneak().fromToDoubleFunction(v -> my_throwing_lambda))}
-     * 
+     *
      * @param <T>
      *            see {@link ToDoubleFunction}
      * @param function
@@ -1129,7 +1073,7 @@ public abstract class CheckedExceptionHandler {
      * @see Exceptions
      */
     public final <T> ToDoubleFunction<T> fromToDoubleFunction(ThrowingToDoubleFunction<T> function) {
-        return new CheckedToDoubleFunction<T>(function);
+        return new CheckedToDoubleFunction<>(function);
     }
     private final class CheckedToDoubleFunction<T> implements ToDoubleFunction<T> {
         private final ThrowingToDoubleFunction<T> function;
@@ -1144,8 +1088,6 @@ public abstract class CheckedExceptionHandler {
                 throw exception;
             } catch (Exception exception) {
                 throw handle(exception);
-            } catch (Throwable exception) {
-                throw SneakingHandler.sneak(exception);
             }
         }
     }
@@ -1157,7 +1099,7 @@ public abstract class CheckedExceptionHandler {
      * Null {@code function} is silently wrapped and causes {@link NullPointerException} when executed.
      * <p>
      * Typical usage: {@code methodTakingDoubleFunction(Exceptions.sneak().fromDoubleFunction(v -> my_throwing_lambda))}
-     * 
+     *
      * @param <R>
      *            see {@link DoubleFunction}
      * @param function
@@ -1167,7 +1109,7 @@ public abstract class CheckedExceptionHandler {
      * @see Exceptions
      */
     public final <R> DoubleFunction<R> fromDoubleFunction(ThrowingDoubleFunction<R> function) {
-        return new CheckedDoubleFunction<R>(function);
+        return new CheckedDoubleFunction<>(function);
     }
     private final class CheckedDoubleFunction<R> implements DoubleFunction<R> {
         private final ThrowingDoubleFunction<R> function;
@@ -1182,8 +1124,6 @@ public abstract class CheckedExceptionHandler {
                 throw exception;
             } catch (Exception exception) {
                 throw handle(exception);
-            } catch (Throwable exception) {
-                throw SneakingHandler.sneak(exception);
             }
         }
     }
@@ -1195,7 +1135,7 @@ public abstract class CheckedExceptionHandler {
      * Null {@code function} is silently wrapped and causes {@link NullPointerException} when executed.
      * <p>
      * Typical usage: {@code methodTakingDoubleToIntFunction(Exceptions.sneak().fromDoubleToIntFunction(v -> my_throwing_lambda))}
-     * 
+     *
      * @param function
      *            the {@link ThrowingDoubleToIntFunction} to be converted, usually a lambda
      * @return converted {@link DoubleToIntFunction} free of checked exceptions
@@ -1218,8 +1158,6 @@ public abstract class CheckedExceptionHandler {
                 throw exception;
             } catch (Exception exception) {
                 throw handle(exception);
-            } catch (Throwable exception) {
-                throw SneakingHandler.sneak(exception);
             }
         }
     }
@@ -1231,7 +1169,7 @@ public abstract class CheckedExceptionHandler {
      * Null {@code function} is silently wrapped and causes {@link NullPointerException} when executed.
      * <p>
      * Typical usage: {@code methodTakingDoubleToLongFunction(Exceptions.sneak().fromDoubleToLongFunction(v -> my_throwing_lambda))}
-     * 
+     *
      * @param function
      *            the {@link ThrowingDoubleToLongFunction} to be converted, usually a lambda
      * @return converted {@link DoubleToLongFunction} free of checked exceptions
@@ -1254,8 +1192,6 @@ public abstract class CheckedExceptionHandler {
                 throw exception;
             } catch (Exception exception) {
                 throw handle(exception);
-            } catch (Throwable exception) {
-                throw SneakingHandler.sneak(exception);
             }
         }
     }
@@ -1267,7 +1203,7 @@ public abstract class CheckedExceptionHandler {
      * Null {@code operator} is silently wrapped and causes {@link NullPointerException} when executed.
      * <p>
      * Typical usage: {@code methodTakingUnaryOperator(Exceptions.sneak().fromUnaryOperator(o -> my_throwing_lambda))}
-     * 
+     *
      * @param <T>
      *            see {@link UnaryOperator}
      * @param operator
@@ -1277,7 +1213,7 @@ public abstract class CheckedExceptionHandler {
      * @see Exceptions
      */
     public final <T> UnaryOperator<T> fromUnaryOperator(ThrowingUnaryOperator<T> operator) {
-        return new CheckedUnaryOperator<T>(operator);
+        return new CheckedUnaryOperator<>(operator);
     }
     private final class CheckedUnaryOperator<T> implements UnaryOperator<T> {
         private final ThrowingUnaryOperator<T> operator;
@@ -1292,8 +1228,6 @@ public abstract class CheckedExceptionHandler {
                 throw exception;
             } catch (Exception exception) {
                 throw handle(exception);
-            } catch (Throwable exception) {
-                throw SneakingHandler.sneak(exception);
             }
         }
     }
@@ -1305,7 +1239,7 @@ public abstract class CheckedExceptionHandler {
      * Null {@code operator} is silently wrapped and causes {@link NullPointerException} when executed.
      * <p>
      * Typical usage: {@code methodTakingIntUnaryOperator(Exceptions.sneak().fromIntUnaryOperator(o -> my_throwing_lambda))}
-     * 
+     *
      * @param operator
      *            the {@link ThrowingIntUnaryOperator} to be converted, usually a lambda
      * @return converted {@link IntUnaryOperator} free of checked exceptions
@@ -1328,8 +1262,6 @@ public abstract class CheckedExceptionHandler {
                 throw exception;
             } catch (Exception exception) {
                 throw handle(exception);
-            } catch (Throwable exception) {
-                throw SneakingHandler.sneak(exception);
             }
         }
     }
@@ -1341,7 +1273,7 @@ public abstract class CheckedExceptionHandler {
      * Null {@code operator} is silently wrapped and causes {@link NullPointerException} when executed.
      * <p>
      * Typical usage: {@code methodTakingLongUnaryOperator(Exceptions.sneak().fromLongUnaryOperator(o -> my_throwing_lambda))}
-     * 
+     *
      * @param operator
      *            the {@link ThrowingLongUnaryOperator} to be converted, usually a lambda
      * @return converted {@link LongUnaryOperator} free of checked exceptions
@@ -1364,8 +1296,6 @@ public abstract class CheckedExceptionHandler {
                 throw exception;
             } catch (Exception exception) {
                 throw handle(exception);
-            } catch (Throwable exception) {
-                throw SneakingHandler.sneak(exception);
             }
         }
     }
@@ -1377,7 +1307,7 @@ public abstract class CheckedExceptionHandler {
      * Null {@code operator} is silently wrapped and causes {@link NullPointerException} when executed.
      * <p>
      * Typical usage: {@code methodTakingDoubleUnaryOperator(Exceptions.sneak().fromDoubleUnaryOperator(o -> my_throwing_lambda))}
-     * 
+     *
      * @param operator
      *            the {@link ThrowingDoubleUnaryOperator} to be converted, usually a lambda
      * @return converted {@link DoubleUnaryOperator} free of checked exceptions
@@ -1400,8 +1330,6 @@ public abstract class CheckedExceptionHandler {
                 throw exception;
             } catch (Exception exception) {
                 throw handle(exception);
-            } catch (Throwable exception) {
-                throw SneakingHandler.sneak(exception);
             }
         }
     }
@@ -1413,7 +1341,7 @@ public abstract class CheckedExceptionHandler {
      * Null {@code function} is silently wrapped and causes {@link NullPointerException} when executed.
      * <p>
      * Typical usage: {@code methodTakingBiFunction(Exceptions.sneak().fromBiFunction((t, u) -> my_throwing_lambda))}
-     * 
+     *
      * @param <T>
      *            see {@link BiFunction}
      * @param <U>
@@ -1427,7 +1355,7 @@ public abstract class CheckedExceptionHandler {
      * @see Exceptions
      */
     public final <T, U, R> BiFunction<T, U, R> fromBiFunction(ThrowingBiFunction<T, U, R> function) {
-        return new CheckedBiFunction<T, U, R>(function);
+        return new CheckedBiFunction<>(function);
     }
     private final class CheckedBiFunction<T, U, R> implements BiFunction<T, U, R> {
         private final ThrowingBiFunction<T, U, R> function;
@@ -1442,8 +1370,6 @@ public abstract class CheckedExceptionHandler {
                 throw exception;
             } catch (Exception exception) {
                 throw handle(exception);
-            } catch (Throwable exception) {
-                throw SneakingHandler.sneak(exception);
             }
         }
     }
@@ -1455,7 +1381,7 @@ public abstract class CheckedExceptionHandler {
      * Null {@code function} is silently wrapped and causes {@link NullPointerException} when executed.
      * <p>
      * Typical usage: {@code methodTakingToIntBiFunction(Exceptions.sneak().fromToIntBiFunction((t, u) -> my_throwing_lambda))}
-     * 
+     *
      * @param <T>
      *            see {@link ToIntBiFunction}
      * @param <U>
@@ -1467,7 +1393,7 @@ public abstract class CheckedExceptionHandler {
      * @see Exceptions
      */
     public final <T, U> ToIntBiFunction<T, U> fromToIntBiFunction(ThrowingToIntBiFunction<T, U> function) {
-        return new CheckedToIntBiFunction<T, U>(function);
+        return new CheckedToIntBiFunction<>(function);
     }
     private final class CheckedToIntBiFunction<T, U> implements ToIntBiFunction<T, U> {
         private final ThrowingToIntBiFunction<T, U> function;
@@ -1482,8 +1408,6 @@ public abstract class CheckedExceptionHandler {
                 throw exception;
             } catch (Exception exception) {
                 throw handle(exception);
-            } catch (Throwable exception) {
-                throw SneakingHandler.sneak(exception);
             }
         }
     }
@@ -1495,7 +1419,7 @@ public abstract class CheckedExceptionHandler {
      * Null {@code function} is silently wrapped and causes {@link NullPointerException} when executed.
      * <p>
      * Typical usage: {@code methodTakingToLongBiFunction(Exceptions.sneak().fromToLongBiFunction((t, u) -> my_throwing_lambda))}
-     * 
+     *
      * @param <T>
      *            see {@link ToLongBiFunction}
      * @param <U>
@@ -1507,7 +1431,7 @@ public abstract class CheckedExceptionHandler {
      * @see Exceptions
      */
     public final <T, U> ToLongBiFunction<T, U> fromToLongBiFunction(ThrowingToLongBiFunction<T, U> function) {
-        return new CheckedToLongBiFunction<T, U>(function);
+        return new CheckedToLongBiFunction<>(function);
     }
     private final class CheckedToLongBiFunction<T, U> implements ToLongBiFunction<T, U> {
         private final ThrowingToLongBiFunction<T, U> function;
@@ -1522,8 +1446,6 @@ public abstract class CheckedExceptionHandler {
                 throw exception;
             } catch (Exception exception) {
                 throw handle(exception);
-            } catch (Throwable exception) {
-                throw SneakingHandler.sneak(exception);
             }
         }
     }
@@ -1535,7 +1457,7 @@ public abstract class CheckedExceptionHandler {
      * Null {@code function} is silently wrapped and causes {@link NullPointerException} when executed.
      * <p>
      * Typical usage: {@code methodTakingToDoubleBiFunction(Exceptions.sneak().fromToDoubleBiFunction((t, u) -> my_throwing_lambda))}
-     * 
+     *
      * @param <T>
      *            see {@link ToDoubleBiFunction}
      * @param <U>
@@ -1547,7 +1469,7 @@ public abstract class CheckedExceptionHandler {
      * @see Exceptions
      */
     public final <T, U> ToDoubleBiFunction<T, U> fromToDoubleBiFunction(ThrowingToDoubleBiFunction<T, U> function) {
-        return new CheckedToDoubleBiFunction<T, U>(function);
+        return new CheckedToDoubleBiFunction<>(function);
     }
     private final class CheckedToDoubleBiFunction<T, U> implements ToDoubleBiFunction<T, U> {
         private final ThrowingToDoubleBiFunction<T, U> function;
@@ -1562,8 +1484,6 @@ public abstract class CheckedExceptionHandler {
                 throw exception;
             } catch (Exception exception) {
                 throw handle(exception);
-            } catch (Throwable exception) {
-                throw SneakingHandler.sneak(exception);
             }
         }
     }
@@ -1575,7 +1495,7 @@ public abstract class CheckedExceptionHandler {
      * Null {@code operator} is silently wrapped and causes {@link NullPointerException} when executed.
      * <p>
      * Typical usage: {@code methodTakingBinaryOperator(Exceptions.sneak().fromBinaryOperator((l, r) -> my_throwing_lambda))}
-     * 
+     *
      * @param <T>
      *            see {@link BinaryOperator}
      * @param operator
@@ -1585,7 +1505,7 @@ public abstract class CheckedExceptionHandler {
      * @see Exceptions
      */
     public final <T> BinaryOperator<T> fromBinaryOperator(ThrowingBinaryOperator<T> operator) {
-        return new CheckedBinaryOperator<T>(operator);
+        return new CheckedBinaryOperator<>(operator);
     }
     private final class CheckedBinaryOperator<T> implements BinaryOperator<T> {
         private final ThrowingBinaryOperator<T> operator;
@@ -1600,8 +1520,6 @@ public abstract class CheckedExceptionHandler {
                 throw exception;
             } catch (Exception exception) {
                 throw handle(exception);
-            } catch (Throwable exception) {
-                throw SneakingHandler.sneak(exception);
             }
         }
     }
@@ -1613,7 +1531,7 @@ public abstract class CheckedExceptionHandler {
      * Null {@code operator} is silently wrapped and causes {@link NullPointerException} when executed.
      * <p>
      * Typical usage: {@code methodTakingIntBinaryOperator(Exceptions.sneak().fromIntBinaryOperator((l, r) -> my_throwing_lambda))}
-     * 
+     *
      * @param operator
      *            the {@link ThrowingIntBinaryOperator} to be converted, usually a lambda
      * @return converted {@link IntBinaryOperator} free of checked exceptions
@@ -1636,8 +1554,6 @@ public abstract class CheckedExceptionHandler {
                 throw exception;
             } catch (Exception exception) {
                 throw handle(exception);
-            } catch (Throwable exception) {
-                throw SneakingHandler.sneak(exception);
             }
         }
     }
@@ -1649,7 +1565,7 @@ public abstract class CheckedExceptionHandler {
      * Null {@code operator} is silently wrapped and causes {@link NullPointerException} when executed.
      * <p>
      * Typical usage: {@code methodTakingLongBinaryOperator(Exceptions.sneak().fromLongBinaryOperator((l, r) -> my_throwing_lambda))}
-     * 
+     *
      * @param operator
      *            the {@link ThrowingLongBinaryOperator} to be converted, usually a lambda
      * @return converted {@link LongBinaryOperator} free of checked exceptions
@@ -1672,8 +1588,6 @@ public abstract class CheckedExceptionHandler {
                 throw exception;
             } catch (Exception exception) {
                 throw handle(exception);
-            } catch (Throwable exception) {
-                throw SneakingHandler.sneak(exception);
             }
         }
     }
@@ -1685,7 +1599,7 @@ public abstract class CheckedExceptionHandler {
      * Null {@code operator} is silently wrapped and causes {@link NullPointerException} when executed.
      * <p>
      * Typical usage: {@code methodTakingDoubleBinaryOperator(Exceptions.sneak().fromDoubleBinaryOperator((l, r) -> my_throwing_lambda))}
-     * 
+     *
      * @param operator
      *            the {@link ThrowingDoubleBinaryOperator} to be converted, usually a lambda
      * @return converted {@link DoubleBinaryOperator} free of checked exceptions
@@ -1708,8 +1622,6 @@ public abstract class CheckedExceptionHandler {
                 throw exception;
             } catch (Exception exception) {
                 throw handle(exception);
-            } catch (Throwable exception) {
-                throw SneakingHandler.sneak(exception);
             }
         }
     }
@@ -1721,7 +1633,7 @@ public abstract class CheckedExceptionHandler {
      * Null {@code comparator} is silently wrapped and causes {@link NullPointerException} when executed.
      * <p>
      * Typical usage: {@code methodTakingComparator(Exceptions.sneak().comparator((l, r) -> my_throwing_lambda))}
-     * 
+     *
      * @param <T>
      *            see {@link Comparator}
      * @param comparator
@@ -1731,7 +1643,7 @@ public abstract class CheckedExceptionHandler {
      * @see Exceptions
      */
     public final <T> Comparator<T> comparator(ThrowingComparator<T> comparator) {
-        return new CheckedComparator<T>(comparator);
+        return new CheckedComparator<>(comparator);
     }
     private final class CheckedComparator<T> implements Comparator<T> {
         private final ThrowingComparator<T> comparator;
@@ -1746,8 +1658,6 @@ public abstract class CheckedExceptionHandler {
                 throw exception;
             } catch (Exception exception) {
                 throw handle(exception);
-            } catch (Throwable exception) {
-                throw SneakingHandler.sneak(exception);
             }
         }
     }
@@ -1759,7 +1669,7 @@ public abstract class CheckedExceptionHandler {
      * Null {@code closeable} is silently wrapped and causes {@link NullPointerException} when executed.
      * <p>
      * Typical usage: {@code try (var scope = Exceptions.sneak().closeable(openSomething()))}
-     * 
+     *
      * @param closeable
      *            the {@link AutoCloseable} to be converted
      * @return converted {@link CloseableScope} free of checked exceptions
@@ -1782,8 +1692,6 @@ public abstract class CheckedExceptionHandler {
                 throw exception;
             } catch (Exception exception) {
                 throw handle(exception);
-            } catch (Throwable exception) {
-                throw SneakingHandler.sneak(exception);
             }
         }
     }
@@ -1794,7 +1702,7 @@ public abstract class CheckedExceptionHandler {
      * which usually converts it to an unchecked exception, which is then thrown by this method.
      * <p>
      * Typical usage: {@code Exceptions.sneak().run(() -> my_throwing_lambda))}
-     * 
+     *
      * @param runnable
      *            the {@link ThrowingRunnable} to run, usually a lambda
      * @throws NullPointerException
@@ -1809,8 +1717,6 @@ public abstract class CheckedExceptionHandler {
             throw exception;
         } catch (Exception exception) {
             throw handle(exception);
-        } catch (Throwable exception) {
-            throw SneakingHandler.sneak(exception);
         }
     }
     /**
@@ -1820,7 +1726,7 @@ public abstract class CheckedExceptionHandler {
      * which usually converts it to an unchecked exception, which is then thrown by this method.
      * <p>
      * Typical usage: {@code Exceptions.sneak().get(() -> my_throwing_lambda))}
-     * 
+     *
      * @param <T>
      *            see {@link Supplier}
      * @param supplier
@@ -1838,8 +1744,6 @@ public abstract class CheckedExceptionHandler {
             throw exception;
         } catch (Exception exception) {
             throw handle(exception);
-        } catch (Throwable exception) {
-            throw SneakingHandler.sneak(exception);
         }
     }
     /**
@@ -1849,7 +1753,7 @@ public abstract class CheckedExceptionHandler {
      * which usually converts it to an unchecked exception, which is then thrown by this method.
      * <p>
      * Typical usage: {@code Exceptions.sneak().getAsInt(() -> my_throwing_lambda))}
-     * 
+     *
      * @param supplier
      *            the {@link ThrowingIntSupplier} to run, usually a lambda
      * @return value returned from {@code supplier}
@@ -1865,8 +1769,6 @@ public abstract class CheckedExceptionHandler {
             throw exception;
         } catch (Exception exception) {
             throw handle(exception);
-        } catch (Throwable exception) {
-            throw SneakingHandler.sneak(exception);
         }
     }
     /**
@@ -1876,7 +1778,7 @@ public abstract class CheckedExceptionHandler {
      * which usually converts it to an unchecked exception, which is then thrown by this method.
      * <p>
      * Typical usage: {@code Exceptions.sneak().getAsLong(() -> my_throwing_lambda))}
-     * 
+     *
      * @param supplier
      *            the {@link ThrowingLongSupplier} to run, usually a lambda
      * @return value returned from {@code supplier}
@@ -1892,8 +1794,6 @@ public abstract class CheckedExceptionHandler {
             throw exception;
         } catch (Exception exception) {
             throw handle(exception);
-        } catch (Throwable exception) {
-            throw SneakingHandler.sneak(exception);
         }
     }
     /**
@@ -1903,7 +1803,7 @@ public abstract class CheckedExceptionHandler {
      * which usually converts it to an unchecked exception, which is then thrown by this method.
      * <p>
      * Typical usage: {@code Exceptions.sneak().getAsDouble(() -> my_throwing_lambda))}
-     * 
+     *
      * @param supplier
      *            the {@link ThrowingDoubleSupplier} to run, usually a lambda
      * @return value returned from {@code supplier}
@@ -1919,8 +1819,6 @@ public abstract class CheckedExceptionHandler {
             throw exception;
         } catch (Exception exception) {
             throw handle(exception);
-        } catch (Throwable exception) {
-            throw SneakingHandler.sneak(exception);
         }
     }
     /**
@@ -1930,7 +1828,7 @@ public abstract class CheckedExceptionHandler {
      * which usually converts it to an unchecked exception, which is then thrown by this method.
      * <p>
      * Typical usage: {@code Exceptions.sneak().getAsBoolean(() -> my_throwing_lambda))}
-     * 
+     *
      * @param supplier
      *            the {@link ThrowingBooleanSupplier} to run, usually a lambda
      * @return value returned from {@code supplier}
@@ -1946,8 +1844,6 @@ public abstract class CheckedExceptionHandler {
             throw exception;
         } catch (Exception exception) {
             throw handle(exception);
-        } catch (Throwable exception) {
-            throw SneakingHandler.sneak(exception);
         }
     }
 }

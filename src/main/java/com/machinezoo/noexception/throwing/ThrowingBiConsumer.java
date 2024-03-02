@@ -10,7 +10,7 @@ import com.machinezoo.noexception.*;
  * {@code ThrowingBiConsumer} is usually implemented by a lambda
  * and passed to {@link CheckedExceptionHandler#fromBiConsumer(ThrowingBiConsumer)}.
  * See <a href="https://noexception.machinezoo.com/">noexception tutorial</a>.
- * 
+ *
  * @param <T>
  *            see {@link BiConsumer}
  * @param <U>
@@ -22,15 +22,15 @@ import com.machinezoo.noexception.*;
 public interface ThrowingBiConsumer<T, U> {
     /**
      * Variation of {@link BiConsumer#accept(Object, Object)} that allows throwing checked exceptions.
-     * 
+     *
      * @param t
      *            see {@link BiConsumer#accept(Object, Object)}
      * @param u
      *            see {@link BiConsumer#accept(Object, Object)}
-     * @throws Throwable
+     * @throws Exception
      *             if unable to complete
      * @see CheckedExceptionHandler#fromBiConsumer(ThrowingBiConsumer)
      * @see BiConsumer#accept(Object, Object)
      */
-    void accept(T t, U u) throws Throwable;
+    void accept(T t, U u) throws Exception;
 }

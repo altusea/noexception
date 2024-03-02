@@ -11,16 +11,16 @@ import com.machinezoo.stagean.*;
 /**
  * Represents exception handling policy.
  * Methods of this class apply the exception policy to functional interfaces (usually lambdas) by wrapping them in a try-catch block.
- * Method {@link #handle(Throwable)} defines the exception handling policy when implemented in derived class.
+ * Method {@link #handle(Exception)} defines the exception handling policy when implemented in derived class.
  * See <a href="https://noexception.machinezoo.com/">noexception tutorial</a>.
  * <p>
  * Typical usage: {@code Exceptions.silence().get(() -> my_throwing_lambda).orElse(fallback)}
  * <p>
  * All wrapping methods surround the functional interface with a try-catch block.
- * If the functional interface throws, the exception is caught and passed to {@link #handle(Throwable)},
+ * If the functional interface throws, the exception is caught and passed to {@link #handle(Exception)},
  * which applies exception handling policy (silence, propagate, logging, custom).
  * {@link NullPointerException} from {@code null} functional interface is caught too.
- * Unless {@link #handle(Throwable)} requests a rethrow, void functional interfaces complete normally
+ * Unless {@link #handle(Exception)} requests a rethrow, void functional interfaces complete normally
  * while non-void functional interfaces return empty {@link Optional}.
  * <p>
  * Wrapping methods for all standard functional interfaces are provided.
@@ -34,9 +34,9 @@ import com.machinezoo.stagean.*;
  * This {@link Optional} is empty in case of exception.
  * Callers can use {@link Optional#orElse(Object)} and {@link Optional#orElseGet(Supplier)} and their
  * equivalents on {@code OptionalX} interfaces to provide fallback values.
- * 
+ *
  * @see <a href="https://noexception.machinezoo.com/">Tutorial</a>
- * @see #handle(Throwable)
+ * @see #handle(Exception)
  * @see Exceptions
  * @see OptionalSupplier
  * @see Optional
@@ -51,7 +51,7 @@ import com.machinezoo.stagean.*;
  * Or with checked exceptions: Exceptions.silence().except(exclusions).sneaked().run(task).
  * Once implemented, it can be used to improve ReactiveExceptions.
  */
-@ApiIssue("Add only/except(Predicate<Throwable>), which return handler that rethrows selected exceptions without passing them to handle().")
+@ApiIssue("Add only/except(Predicate<Exception>), which return handler that rethrows selected exceptions without passing them to handle().")
 public abstract class ExceptionHandler {
     /**
      * Handles exception in a generic way. This method must be defined in a derived class.
@@ -65,7 +65,7 @@ public abstract class ExceptionHandler {
      * It can indicate through return value whether it has accepted or rejected the exception.
      * When an exception is rejected, caller of this method is expected to rethrow the exception.
      * All other methods of this class fulfill this requirement.
-     * 
+     *
      * @param exception
      *            the exception to handle
      * @return {@code true} when exception is handled, {@code false} if the exception should be rethrown
@@ -74,7 +74,7 @@ public abstract class ExceptionHandler {
      * @see <a href="https://noexception.machinezoo.com/">Tutorial</a>
      * @see Exceptions
      */
-    public abstract boolean handle(Throwable exception);
+    public abstract boolean handle(Exception exception);
     /**
      * Initialize new {@code ExceptionHandler}.
      */
@@ -88,8 +88,8 @@ public abstract class ExceptionHandler {
      * Reusable exception handlers can be defined once as {@code ExceptionHandler} instances
      * and then transformed into {@link ExceptionFilter} by this method when needed.
      * <p>
-     * If method {@link #handle(Throwable)} throws, the returned {@link ExceptionFilter} will pass through that exception.
-     * It only rethrows the original exception if {@link #handle(Throwable)} returns normally (regardless of return value).
+     * If method {@link #handle(Exception)} throws, the returned {@link ExceptionFilter} will pass through that exception.
+     * It only rethrows the original exception if {@link #handle(Exception)} returns normally (regardless of return value).
      * <p>
      * Typical usage: {@code ExceptionLogging.log().passing().get(() -> my_throwing_lambda)}
      *
@@ -101,13 +101,13 @@ public abstract class ExceptionHandler {
     /**
      * Wraps {@link Runnable} in a try-catch block.
      * <p>
-     * If {@code runnable} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code runnable} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code runnable} is caught too.
-     * Wrapper then completes normally unless {@link #handle(Throwable)} requests a rethrow.
+     * Wrapper then completes normally unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().runnable(() -> my_throwing_lambda)}
-     * 
+     *
      * @param runnable
      *            the {@link Runnable} to wrap, usually a lambda
      * @return wrapper that runs {@code runnable} in a try-catch block
@@ -126,7 +126,7 @@ public abstract class ExceptionHandler {
         public void run() {
             try {
                 runnable.run();
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 if (!handle(exception))
                     throw exception;
             }
@@ -135,13 +135,13 @@ public abstract class ExceptionHandler {
     /**
      * Wraps {@link Supplier} in a try-catch block.
      * <p>
-     * If {@code supplier} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code supplier} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code supplier} is caught too.
-     * Wrapper then returns empty {@link Optional} unless {@link #handle(Throwable)} requests a rethrow.
+     * Wrapper then returns empty {@link Optional} unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().supplier(() -> my_throwing_lambda).orElse(fallback)}
-     * 
+     *
      * @param <T>
      *            see {@link Supplier}
      * @param supplier
@@ -151,7 +151,7 @@ public abstract class ExceptionHandler {
      * @see Exceptions
      */
     public final <T> OptionalSupplier<T> supplier(Supplier<T> supplier) {
-        return new CatchingSupplier<T>(supplier);
+        return new CatchingSupplier<>(supplier);
     }
     private final class CatchingSupplier<T> implements OptionalSupplier<T> {
         private final Supplier<T> supplier;
@@ -162,7 +162,7 @@ public abstract class ExceptionHandler {
         public Optional<T> get() {
             try {
                 return Optional.ofNullable(supplier.get());
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 if (!handle(exception))
                     throw exception;
                 return Optional.empty();
@@ -172,13 +172,13 @@ public abstract class ExceptionHandler {
     /**
      * Wraps {@link IntSupplier} in a try-catch block.
      * <p>
-     * If {@code supplier} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code supplier} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code supplier} is caught too.
-     * Wrapper then returns empty {@link OptionalInt} unless {@link #handle(Throwable)} requests a rethrow.
+     * Wrapper then returns empty {@link OptionalInt} unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().fromIntSupplier(() -> my_throwing_lambda).orElse(fallback)}
-     * 
+     *
      * @param supplier
      *            the {@link IntSupplier} to wrap, usually a lambda
      * @return wrapper that runs {@code supplier} in a try-catch block
@@ -197,7 +197,7 @@ public abstract class ExceptionHandler {
         public OptionalInt get() {
             try {
                 return OptionalInt.of(supplier.getAsInt());
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 if (!handle(exception))
                     throw exception;
                 return OptionalInt.empty();
@@ -207,13 +207,13 @@ public abstract class ExceptionHandler {
     /**
      * Wraps {@link LongSupplier} in a try-catch block.
      * <p>
-     * If {@code supplier} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code supplier} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code supplier} is caught too.
-     * Wrapper then returns empty {@link OptionalLong} unless {@link #handle(Throwable)} requests a rethrow.
+     * Wrapper then returns empty {@link OptionalLong} unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().fromLongSupplier(() -> my_throwing_lambda).orElse(fallback)}
-     * 
+     *
      * @param supplier
      *            the {@link LongSupplier} to wrap, usually a lambda
      * @return wrapper that runs {@code supplier} in a try-catch block
@@ -232,7 +232,7 @@ public abstract class ExceptionHandler {
         public OptionalLong get() {
             try {
                 return OptionalLong.of(supplier.getAsLong());
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 if (!handle(exception))
                     throw exception;
                 return OptionalLong.empty();
@@ -242,13 +242,13 @@ public abstract class ExceptionHandler {
     /**
      * Wraps {@link DoubleSupplier} in a try-catch block.
      * <p>
-     * If {@code supplier} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code supplier} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code supplier} is caught too.
-     * Wrapper then returns empty {@link OptionalDouble} unless {@link #handle(Throwable)} requests a rethrow.
+     * Wrapper then returns empty {@link OptionalDouble} unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().fromDoubleSupplier(() -> my_throwing_lambda).orElse(fallback)}
-     * 
+     *
      * @param supplier
      *            the {@link DoubleSupplier} to wrap, usually a lambda
      * @return wrapper that runs {@code supplier} in a try-catch block
@@ -267,7 +267,7 @@ public abstract class ExceptionHandler {
         public OptionalDouble get() {
             try {
                 return OptionalDouble.of(supplier.getAsDouble());
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 if (!handle(exception))
                     throw exception;
                 return OptionalDouble.empty();
@@ -277,13 +277,13 @@ public abstract class ExceptionHandler {
     /**
      * Wraps {@link BooleanSupplier} in a try-catch block.
      * <p>
-     * If {@code supplier} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code supplier} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code supplier} is caught too.
-     * Wrapper then returns empty {@link OptionalBoolean} unless {@link #handle(Throwable)} requests a rethrow.
+     * Wrapper then returns empty {@link OptionalBoolean} unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().fromBooleanSupplier(() -> my_throwing_lambda).orElse(fallback)}
-     * 
+     *
      * @param supplier
      *            the {@link BooleanSupplier} to wrap, usually a lambda
      * @return wrapper that runs {@code supplier} in a try-catch block
@@ -302,7 +302,7 @@ public abstract class ExceptionHandler {
         public OptionalBoolean get() {
             try {
                 return OptionalBoolean.of(supplier.getAsBoolean());
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 if (!handle(exception))
                     throw exception;
                 return OptionalBoolean.empty();
@@ -312,13 +312,13 @@ public abstract class ExceptionHandler {
     /**
      * Wraps {@link Consumer} in a try-catch block.
      * <p>
-     * If {@code consumer} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code consumer} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code consumer} is caught too.
-     * Wrapper then completes normally unless {@link #handle(Throwable)} requests a rethrow.
+     * Wrapper then completes normally unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().consumer(t -> my_throwing_lambda)}
-     * 
+     *
      * @param <T>
      *            see {@link Consumer}
      * @param consumer
@@ -328,7 +328,7 @@ public abstract class ExceptionHandler {
      * @see Exceptions
      */
     public final <T> Consumer<T> consumer(Consumer<T> consumer) {
-        return new CatchingConsumer<T>(consumer);
+        return new CatchingConsumer<>(consumer);
     }
     private final class CatchingConsumer<T> implements Consumer<T> {
         private final Consumer<T> consumer;
@@ -339,7 +339,7 @@ public abstract class ExceptionHandler {
         public void accept(T t) {
             try {
                 consumer.accept(t);
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 if (!handle(exception))
                     throw exception;
             }
@@ -348,13 +348,13 @@ public abstract class ExceptionHandler {
     /**
      * Wraps {@link IntConsumer} in a try-catch block.
      * <p>
-     * If {@code consumer} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code consumer} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code consumer} is caught too.
-     * Wrapper then completes normally unless {@link #handle(Throwable)} requests a rethrow.
+     * Wrapper then completes normally unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().fromIntConsumer(v -> my_throwing_lambda)}
-     * 
+     *
      * @param consumer
      *            the {@link IntConsumer} to wrap, usually a lambda
      * @return wrapper that runs {@code consumer} in a try-catch block
@@ -373,7 +373,7 @@ public abstract class ExceptionHandler {
         public void accept(int value) {
             try {
                 consumer.accept(value);
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 if (!handle(exception))
                     throw exception;
             }
@@ -382,13 +382,13 @@ public abstract class ExceptionHandler {
     /**
      * Wraps {@link LongConsumer} in a try-catch block.
      * <p>
-     * If {@code consumer} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code consumer} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code consumer} is caught too.
-     * Wrapper then completes normally unless {@link #handle(Throwable)} requests a rethrow.
+     * Wrapper then completes normally unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().fromLongConsumer(v -> my_throwing_lambda)}
-     * 
+     *
      * @param consumer
      *            the {@link LongConsumer} to wrap, usually a lambda
      * @return wrapper that runs {@code consumer} in a try-catch block
@@ -407,7 +407,7 @@ public abstract class ExceptionHandler {
         public void accept(long value) {
             try {
                 consumer.accept(value);
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 if (!handle(exception))
                     throw exception;
             }
@@ -416,13 +416,13 @@ public abstract class ExceptionHandler {
     /**
      * Wraps {@link DoubleConsumer} in a try-catch block.
      * <p>
-     * If {@code consumer} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code consumer} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code consumer} is caught too.
-     * Wrapper then completes normally unless {@link #handle(Throwable)} requests a rethrow.
+     * Wrapper then completes normally unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().fromDoubleConsumer(v -> my_throwing_lambda)}
-     * 
+     *
      * @param consumer
      *            the {@link DoubleConsumer} to wrap, usually a lambda
      * @return wrapper that runs {@code consumer} in a try-catch block
@@ -441,7 +441,7 @@ public abstract class ExceptionHandler {
         public void accept(double value) {
             try {
                 consumer.accept(value);
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 if (!handle(exception))
                     throw exception;
             }
@@ -450,13 +450,13 @@ public abstract class ExceptionHandler {
     /**
      * Wraps {@link BiConsumer} in a try-catch block.
      * <p>
-     * If {@code consumer} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code consumer} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code consumer} is caught too.
-     * Wrapper then completes normally unless {@link #handle(Throwable)} requests a rethrow.
+     * Wrapper then completes normally unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().fromBiConsumer((t, u) -> my_throwing_lambda)}
-     * 
+     *
      * @param <T>
      *            see {@link BiConsumer}
      * @param <U>
@@ -468,7 +468,7 @@ public abstract class ExceptionHandler {
      * @see Exceptions
      */
     public final <T, U> BiConsumer<T, U> fromBiConsumer(BiConsumer<T, U> consumer) {
-        return new CatchingBiConsumer<T, U>(consumer);
+        return new CatchingBiConsumer<>(consumer);
     }
     private final class CatchingBiConsumer<T, U> implements BiConsumer<T, U> {
         private final BiConsumer<T, U> consumer;
@@ -479,7 +479,7 @@ public abstract class ExceptionHandler {
         public void accept(T t, U u) {
             try {
                 consumer.accept(t, u);
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 if (!handle(exception))
                     throw exception;
             }
@@ -488,13 +488,13 @@ public abstract class ExceptionHandler {
     /**
      * Wraps {@link ObjIntConsumer} in a try-catch block.
      * <p>
-     * If {@code consumer} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code consumer} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code consumer} is caught too.
-     * Wrapper then completes normally unless {@link #handle(Throwable)} requests a rethrow.
+     * Wrapper then completes normally unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().fromObjIntConsumer((t, v) -> my_throwing_lambda)}
-     * 
+     *
      * @param <T>
      *            see {@link ObjIntConsumer}
      * @param consumer
@@ -504,7 +504,7 @@ public abstract class ExceptionHandler {
      * @see Exceptions
      */
     public final <T> ObjIntConsumer<T> fromObjIntConsumer(ObjIntConsumer<T> consumer) {
-        return new CatchingObjIntConsumer<T>(consumer);
+        return new CatchingObjIntConsumer<>(consumer);
     }
     private final class CatchingObjIntConsumer<T> implements ObjIntConsumer<T> {
         private final ObjIntConsumer<T> consumer;
@@ -515,7 +515,7 @@ public abstract class ExceptionHandler {
         public void accept(T t, int value) {
             try {
                 consumer.accept(t, value);
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 if (!handle(exception))
                     throw exception;
             }
@@ -524,13 +524,13 @@ public abstract class ExceptionHandler {
     /**
      * Wraps {@link ObjLongConsumer} in a try-catch block.
      * <p>
-     * If {@code consumer} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code consumer} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code consumer} is caught too.
-     * Wrapper then completes normally unless {@link #handle(Throwable)} requests a rethrow.
+     * Wrapper then completes normally unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().fromObjLongConsumer((t, v) -> my_throwing_lambda)}
-     * 
+     *
      * @param <T>
      *            see {@link ObjLongConsumer}
      * @param consumer
@@ -540,7 +540,7 @@ public abstract class ExceptionHandler {
      * @see Exceptions
      */
     public final <T> ObjLongConsumer<T> fromObjLongConsumer(ObjLongConsumer<T> consumer) {
-        return new CatchingObjLongConsumer<T>(consumer);
+        return new CatchingObjLongConsumer<>(consumer);
     }
     private final class CatchingObjLongConsumer<T> implements ObjLongConsumer<T> {
         private final ObjLongConsumer<T> consumer;
@@ -551,7 +551,7 @@ public abstract class ExceptionHandler {
         public void accept(T t, long value) {
             try {
                 consumer.accept(t, value);
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 if (!handle(exception))
                     throw exception;
             }
@@ -560,13 +560,13 @@ public abstract class ExceptionHandler {
     /**
      * Wraps {@link ObjDoubleConsumer} in a try-catch block.
      * <p>
-     * If {@code consumer} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code consumer} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code consumer} is caught too.
-     * Wrapper then completes normally unless {@link #handle(Throwable)} requests a rethrow.
+     * Wrapper then completes normally unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().fromObjDoubleConsumer((t, v) -> my_throwing_lambda)}
-     * 
+     *
      * @param <T>
      *            see {@link ObjDoubleConsumer}
      * @param consumer
@@ -576,7 +576,7 @@ public abstract class ExceptionHandler {
      * @see Exceptions
      */
     public final <T> ObjDoubleConsumer<T> fromObjDoubleConsumer(ObjDoubleConsumer<T> consumer) {
-        return new CatchingObjDoubleConsumer<T>(consumer);
+        return new CatchingObjDoubleConsumer<>(consumer);
     }
     private final class CatchingObjDoubleConsumer<T> implements ObjDoubleConsumer<T> {
         private final ObjDoubleConsumer<T> consumer;
@@ -587,7 +587,7 @@ public abstract class ExceptionHandler {
         public void accept(T t, double value) {
             try {
                 consumer.accept(t, value);
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 if (!handle(exception))
                     throw exception;
             }
@@ -596,13 +596,13 @@ public abstract class ExceptionHandler {
     /**
      * Wraps {@link Predicate} in a try-catch block.
      * <p>
-     * If {@code predicate} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code predicate} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code predicate} is caught too.
-     * Wrapper then returns empty {@link OptionalBoolean} unless {@link #handle(Throwable)} requests a rethrow.
+     * Wrapper then returns empty {@link OptionalBoolean} unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().predicate(t -> my_throwing_lambda).orElse(fallback)}
-     * 
+     *
      * @param <T>
      *            see {@link Predicate}
      * @param predicate
@@ -612,7 +612,7 @@ public abstract class ExceptionHandler {
      * @see Exceptions
      */
     public final <T> OptionalPredicate<T> predicate(Predicate<T> predicate) {
-        return new CatchingPredicate<T>(predicate);
+        return new CatchingPredicate<>(predicate);
     }
     private final class CatchingPredicate<T> implements OptionalPredicate<T> {
         private final Predicate<T> predicate;
@@ -623,7 +623,7 @@ public abstract class ExceptionHandler {
         public OptionalBoolean test(T t) {
             try {
                 return OptionalBoolean.of(predicate.test(t));
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 if (!handle(exception))
                     throw exception;
                 return OptionalBoolean.empty();
@@ -633,13 +633,13 @@ public abstract class ExceptionHandler {
     /**
      * Wraps {@link IntPredicate} in a try-catch block.
      * <p>
-     * If {@code predicate} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code predicate} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code predicate} is caught too.
-     * Wrapper then returns empty {@link OptionalBoolean} unless {@link #handle(Throwable)} requests a rethrow.
+     * Wrapper then returns empty {@link OptionalBoolean} unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().fromIntPredicate(v -> my_throwing_lambda).orElse(fallback)}
-     * 
+     *
      * @param predicate
      *            the {@link IntPredicate} to wrap, usually a lambda
      * @return wrapper that runs {@code predicate} in a try-catch block
@@ -658,7 +658,7 @@ public abstract class ExceptionHandler {
         public OptionalBoolean test(int value) {
             try {
                 return OptionalBoolean.of(predicate.test(value));
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 if (!handle(exception))
                     throw exception;
                 return OptionalBoolean.empty();
@@ -668,13 +668,13 @@ public abstract class ExceptionHandler {
     /**
      * Wraps {@link LongPredicate} in a try-catch block.
      * <p>
-     * If {@code predicate} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code predicate} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code predicate} is caught too.
-     * Wrapper then returns empty {@link OptionalBoolean} unless {@link #handle(Throwable)} requests a rethrow.
+     * Wrapper then returns empty {@link OptionalBoolean} unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().fromLongPredicate(v -> my_throwing_lambda).orElse(fallback)}
-     * 
+     *
      * @param predicate
      *            the {@link LongPredicate} to wrap, usually a lambda
      * @return wrapper that runs {@code predicate} in a try-catch block
@@ -693,7 +693,7 @@ public abstract class ExceptionHandler {
         public OptionalBoolean test(long value) {
             try {
                 return OptionalBoolean.of(predicate.test(value));
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 if (!handle(exception))
                     throw exception;
                 return OptionalBoolean.empty();
@@ -703,13 +703,13 @@ public abstract class ExceptionHandler {
     /**
      * Wraps {@link DoublePredicate} in a try-catch block.
      * <p>
-     * If {@code predicate} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code predicate} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code predicate} is caught too.
-     * Wrapper then returns empty {@link OptionalBoolean} unless {@link #handle(Throwable)} requests a rethrow.
+     * Wrapper then returns empty {@link OptionalBoolean} unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().fromDoublePredicate(v -> my_throwing_lambda).orElse(fallback)}
-     * 
+     *
      * @param predicate
      *            the {@link DoublePredicate} to wrap, usually a lambda
      * @return wrapper that runs {@code predicate} in a try-catch block
@@ -728,7 +728,7 @@ public abstract class ExceptionHandler {
         public OptionalBoolean test(double value) {
             try {
                 return OptionalBoolean.of(predicate.test(value));
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 if (!handle(exception))
                     throw exception;
                 return OptionalBoolean.empty();
@@ -738,13 +738,13 @@ public abstract class ExceptionHandler {
     /**
      * Wraps {@link BiPredicate} in a try-catch block.
      * <p>
-     * If {@code predicate} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code predicate} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code predicate} is caught too.
-     * Wrapper then returns empty {@link OptionalBoolean} unless {@link #handle(Throwable)} requests a rethrow.
+     * Wrapper then returns empty {@link OptionalBoolean} unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().fromBiPredicate((t, u) -> my_throwing_lambda).orElse(fallback)}
-     * 
+     *
      * @param <T>
      *            see {@link BiPredicate}
      * @param <U>
@@ -756,7 +756,7 @@ public abstract class ExceptionHandler {
      * @see Exceptions
      */
     public final <T, U> OptionalBiPredicate<T, U> fromBiPredicate(BiPredicate<T, U> predicate) {
-        return new CatchingBiPredicate<T, U>(predicate);
+        return new CatchingBiPredicate<>(predicate);
     }
     private final class CatchingBiPredicate<T, U> implements OptionalBiPredicate<T, U> {
         private final BiPredicate<T, U> predicate;
@@ -767,7 +767,7 @@ public abstract class ExceptionHandler {
         public OptionalBoolean test(T t, U u) {
             try {
                 return OptionalBoolean.of(predicate.test(t, u));
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 if (!handle(exception))
                     throw exception;
                 return OptionalBoolean.empty();
@@ -777,13 +777,13 @@ public abstract class ExceptionHandler {
     /**
      * Wraps {@link Function} in a try-catch block.
      * <p>
-     * If {@code function} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code function} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code function} is caught too.
-     * Wrapper then returns empty {@link Optional} unless {@link #handle(Throwable)} requests a rethrow.
+     * Wrapper then returns empty {@link Optional} unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().function(t -> my_throwing_lambda).orElse(fallback)}
-     * 
+     *
      * @param <T>
      *            see {@link Function}
      * @param <R>
@@ -795,7 +795,7 @@ public abstract class ExceptionHandler {
      * @see Exceptions
      */
     public final <T, R> OptionalFunction<T, R> function(Function<T, R> function) {
-        return new CatchingFunction<T, R>(function);
+        return new CatchingFunction<>(function);
     }
     private final class CatchingFunction<T, R> implements OptionalFunction<T, R> {
         private final Function<T, R> function;
@@ -806,7 +806,7 @@ public abstract class ExceptionHandler {
         public Optional<R> apply(T t) {
             try {
                 return Optional.ofNullable(function.apply(t));
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 if (!handle(exception))
                     throw exception;
                 return Optional.empty();
@@ -816,13 +816,13 @@ public abstract class ExceptionHandler {
     /**
      * Wraps {@link ToIntFunction} in a try-catch block.
      * <p>
-     * If {@code function} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code function} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code function} is caught too.
-     * Wrapper then returns empty {@link OptionalInt} unless {@link #handle(Throwable)} requests a rethrow.
+     * Wrapper then returns empty {@link OptionalInt} unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().fromToIntFunction(v -> my_throwing_lambda).orElse(fallback)}
-     * 
+     *
      * @param <T>
      *            see {@link ToIntFunction}
      * @param function
@@ -832,7 +832,7 @@ public abstract class ExceptionHandler {
      * @see Exceptions
      */
     public final <T> OptionalToIntFunction<T> fromToIntFunction(ToIntFunction<T> function) {
-        return new CatchingToIntFunction<T>(function);
+        return new CatchingToIntFunction<>(function);
     }
     private final class CatchingToIntFunction<T> implements OptionalToIntFunction<T> {
         private final ToIntFunction<T> function;
@@ -843,7 +843,7 @@ public abstract class ExceptionHandler {
         public OptionalInt apply(T value) {
             try {
                 return OptionalInt.of(function.applyAsInt(value));
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 if (!handle(exception))
                     throw exception;
                 return OptionalInt.empty();
@@ -853,13 +853,13 @@ public abstract class ExceptionHandler {
     /**
      * Wraps {@link IntFunction} in a try-catch block.
      * <p>
-     * If {@code function} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code function} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code function} is caught too.
-     * Wrapper then returns empty {@link Optional} unless {@link #handle(Throwable)} requests a rethrow.
+     * Wrapper then returns empty {@link Optional} unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().fromIntFunction(v -> my_throwing_lambda).orElse(fallback)}
-     * 
+     *
      * @param <R>
      *            see {@link IntFunction}
      * @param function
@@ -869,7 +869,7 @@ public abstract class ExceptionHandler {
      * @see Exceptions
      */
     public final <R> OptionalIntFunction<R> fromIntFunction(IntFunction<R> function) {
-        return new CatchingIntFunction<R>(function);
+        return new CatchingIntFunction<>(function);
     }
     private final class CatchingIntFunction<R> implements OptionalIntFunction<R> {
         private final IntFunction<R> function;
@@ -880,7 +880,7 @@ public abstract class ExceptionHandler {
         public Optional<R> apply(int value) {
             try {
                 return Optional.ofNullable(function.apply(value));
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 if (!handle(exception))
                     throw exception;
                 return Optional.empty();
@@ -890,13 +890,13 @@ public abstract class ExceptionHandler {
     /**
      * Wraps {@link IntToLongFunction} in a try-catch block.
      * <p>
-     * If {@code function} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code function} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code function} is caught too.
-     * Wrapper then returns empty {@link OptionalLong} unless {@link #handle(Throwable)} requests a rethrow.
+     * Wrapper then returns empty {@link OptionalLong} unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().fromIntToLongFunction(v -> my_throwing_lambda).orElse(fallback)}
-     * 
+     *
      * @param function
      *            the {@link IntToLongFunction} to wrap, usually a lambda
      * @return wrapper that runs {@code function} in a try-catch block
@@ -915,7 +915,7 @@ public abstract class ExceptionHandler {
         public OptionalLong apply(int value) {
             try {
                 return OptionalLong.of(function.applyAsLong(value));
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 if (!handle(exception))
                     throw exception;
                 return OptionalLong.empty();
@@ -925,13 +925,13 @@ public abstract class ExceptionHandler {
     /**
      * Wraps {@link IntToDoubleFunction} in a try-catch block.
      * <p>
-     * If {@code function} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code function} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code function} is caught too.
-     * Wrapper then returns empty {@link OptionalDouble} unless {@link #handle(Throwable)} requests a rethrow.
+     * Wrapper then returns empty {@link OptionalDouble} unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().fromIntToDoubleFunction(v -> my_throwing_lambda).orElse(fallback)}
-     * 
+     *
      * @param function
      *            the {@link IntToDoubleFunction} to wrap, usually a lambda
      * @return wrapper that runs {@code function} in a try-catch block
@@ -950,7 +950,7 @@ public abstract class ExceptionHandler {
         public OptionalDouble apply(int value) {
             try {
                 return OptionalDouble.of(function.applyAsDouble(value));
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 if (!handle(exception))
                     throw exception;
                 return OptionalDouble.empty();
@@ -960,13 +960,13 @@ public abstract class ExceptionHandler {
     /**
      * Wraps {@link ToLongFunction} in a try-catch block.
      * <p>
-     * If {@code function} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code function} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code function} is caught too.
-     * Wrapper then returns empty {@link OptionalLong} unless {@link #handle(Throwable)} requests a rethrow.
+     * Wrapper then returns empty {@link OptionalLong} unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().fromToLongFunction(v -> my_throwing_lambda).orElse(fallback)}
-     * 
+     *
      * @param <T>
      *            see {@link ToLongFunction}
      * @param function
@@ -976,7 +976,7 @@ public abstract class ExceptionHandler {
      * @see Exceptions
      */
     public final <T> OptionalToLongFunction<T> fromToLongFunction(ToLongFunction<T> function) {
-        return new CatchingToLongFunction<T>(function);
+        return new CatchingToLongFunction<>(function);
     }
     private final class CatchingToLongFunction<T> implements OptionalToLongFunction<T> {
         private final ToLongFunction<T> function;
@@ -987,7 +987,7 @@ public abstract class ExceptionHandler {
         public OptionalLong apply(T value) {
             try {
                 return OptionalLong.of(function.applyAsLong(value));
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 if (!handle(exception))
                     throw exception;
                 return OptionalLong.empty();
@@ -997,13 +997,13 @@ public abstract class ExceptionHandler {
     /**
      * Wraps {@link LongFunction} in a try-catch block.
      * <p>
-     * If {@code function} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code function} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code function} is caught too.
-     * Wrapper then returns empty {@link Optional} unless {@link #handle(Throwable)} requests a rethrow.
+     * Wrapper then returns empty {@link Optional} unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().fromLongFunction(v -> my_throwing_lambda).orElse(fallback)}
-     * 
+     *
      * @param <R>
      *            see {@link LongFunction}
      * @param function
@@ -1013,7 +1013,7 @@ public abstract class ExceptionHandler {
      * @see Exceptions
      */
     public final <R> OptionalLongFunction<R> fromLongFunction(LongFunction<R> function) {
-        return new CatchingLongFunction<R>(function);
+        return new CatchingLongFunction<>(function);
     }
     private final class CatchingLongFunction<R> implements OptionalLongFunction<R> {
         private final LongFunction<R> function;
@@ -1024,7 +1024,7 @@ public abstract class ExceptionHandler {
         public Optional<R> apply(long value) {
             try {
                 return Optional.ofNullable(function.apply(value));
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 if (!handle(exception))
                     throw exception;
                 return Optional.empty();
@@ -1034,13 +1034,13 @@ public abstract class ExceptionHandler {
     /**
      * Wraps {@link LongToIntFunction} in a try-catch block.
      * <p>
-     * If {@code function} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code function} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code function} is caught too.
-     * Wrapper then returns empty {@link OptionalInt} unless {@link #handle(Throwable)} requests a rethrow.
+     * Wrapper then returns empty {@link OptionalInt} unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().fromLongToIntFunction(v -> my_throwing_lambda).orElse(fallback)}
-     * 
+     *
      * @param function
      *            the {@link LongToIntFunction} to wrap, usually a lambda
      * @return wrapper that runs {@code function} in a try-catch block
@@ -1059,7 +1059,7 @@ public abstract class ExceptionHandler {
         public OptionalInt apply(long value) {
             try {
                 return OptionalInt.of(function.applyAsInt(value));
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 if (!handle(exception))
                     throw exception;
                 return OptionalInt.empty();
@@ -1069,13 +1069,13 @@ public abstract class ExceptionHandler {
     /**
      * Wraps {@link LongToDoubleFunction} in a try-catch block.
      * <p>
-     * If {@code function} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code function} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code function} is caught too.
-     * Wrapper then returns empty {@link OptionalDouble} unless {@link #handle(Throwable)} requests a rethrow.
+     * Wrapper then returns empty {@link OptionalDouble} unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().fromLongToDoubleFunction(v -> my_throwing_lambda).orElse(fallback)}
-     * 
+     *
      * @param function
      *            the {@link LongToDoubleFunction} to wrap, usually a lambda
      * @return wrapper that runs {@code function} in a try-catch block
@@ -1094,7 +1094,7 @@ public abstract class ExceptionHandler {
         public OptionalDouble apply(long value) {
             try {
                 return OptionalDouble.of(function.applyAsDouble(value));
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 if (!handle(exception))
                     throw exception;
                 return OptionalDouble.empty();
@@ -1104,13 +1104,13 @@ public abstract class ExceptionHandler {
     /**
      * Wraps {@link ToDoubleFunction} in a try-catch block.
      * <p>
-     * If {@code function} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code function} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code function} is caught too.
-     * Wrapper then returns empty {@link OptionalDouble} unless {@link #handle(Throwable)} requests a rethrow.
+     * Wrapper then returns empty {@link OptionalDouble} unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().fromToDoubleFunction(v -> my_throwing_lambda).orElse(fallback)}
-     * 
+     *
      * @param <T>
      *            see {@link ToDoubleFunction}
      * @param function
@@ -1120,7 +1120,7 @@ public abstract class ExceptionHandler {
      * @see Exceptions
      */
     public final <T> OptionalToDoubleFunction<T> fromToDoubleFunction(ToDoubleFunction<T> function) {
-        return new CatchingToDoubleFunction<T>(function);
+        return new CatchingToDoubleFunction<>(function);
     }
     private final class CatchingToDoubleFunction<T> implements OptionalToDoubleFunction<T> {
         private final ToDoubleFunction<T> function;
@@ -1131,7 +1131,7 @@ public abstract class ExceptionHandler {
         public OptionalDouble apply(T value) {
             try {
                 return OptionalDouble.of(function.applyAsDouble(value));
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 if (!handle(exception))
                     throw exception;
                 return OptionalDouble.empty();
@@ -1141,13 +1141,13 @@ public abstract class ExceptionHandler {
     /**
      * Wraps {@link DoubleFunction} in a try-catch block.
      * <p>
-     * If {@code function} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code function} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code function} is caught too.
-     * Wrapper then returns empty {@link Optional} unless {@link #handle(Throwable)} requests a rethrow.
+     * Wrapper then returns empty {@link Optional} unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().fromDoubleFunction(v -> my_throwing_lambda).orElse(fallback)}
-     * 
+     *
      * @param <R>
      *            see {@link DoubleFunction}
      * @param function
@@ -1157,7 +1157,7 @@ public abstract class ExceptionHandler {
      * @see Exceptions
      */
     public final <R> OptionalDoubleFunction<R> fromDoubleFunction(DoubleFunction<R> function) {
-        return new CatchingDoubleFunction<R>(function);
+        return new CatchingDoubleFunction<>(function);
     }
     private final class CatchingDoubleFunction<R> implements OptionalDoubleFunction<R> {
         private final DoubleFunction<R> function;
@@ -1168,7 +1168,7 @@ public abstract class ExceptionHandler {
         public Optional<R> apply(double value) {
             try {
                 return Optional.ofNullable(function.apply(value));
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 if (!handle(exception))
                     throw exception;
                 return Optional.empty();
@@ -1178,13 +1178,13 @@ public abstract class ExceptionHandler {
     /**
      * Wraps {@link DoubleToIntFunction} in a try-catch block.
      * <p>
-     * If {@code function} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code function} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code function} is caught too.
-     * Wrapper then returns empty {@link OptionalInt} unless {@link #handle(Throwable)} requests a rethrow.
+     * Wrapper then returns empty {@link OptionalInt} unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().fromDoubleToIntFunction(v -> my_throwing_lambda).orElse(fallback)}
-     * 
+     *
      * @param function
      *            the {@link DoubleToIntFunction} to wrap, usually a lambda
      * @return wrapper that runs {@code function} in a try-catch block
@@ -1203,7 +1203,7 @@ public abstract class ExceptionHandler {
         public OptionalInt apply(double value) {
             try {
                 return OptionalInt.of(function.applyAsInt(value));
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 if (!handle(exception))
                     throw exception;
                 return OptionalInt.empty();
@@ -1213,13 +1213,13 @@ public abstract class ExceptionHandler {
     /**
      * Wraps {@link DoubleToLongFunction} in a try-catch block.
      * <p>
-     * If {@code function} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code function} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code function} is caught too.
-     * Wrapper then returns empty {@link OptionalLong} unless {@link #handle(Throwable)} requests a rethrow.
+     * Wrapper then returns empty {@link OptionalLong} unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().fromDoubleToLongFunction(v -> my_throwing_lambda).orElse(fallback)}
-     * 
+     *
      * @param function
      *            the {@link DoubleToLongFunction} to wrap, usually a lambda
      * @return wrapper that runs {@code function} in a try-catch block
@@ -1238,7 +1238,7 @@ public abstract class ExceptionHandler {
         public OptionalLong apply(double value) {
             try {
                 return OptionalLong.of(function.applyAsLong(value));
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 if (!handle(exception))
                     throw exception;
                 return OptionalLong.empty();
@@ -1248,13 +1248,13 @@ public abstract class ExceptionHandler {
     /**
      * Wraps {@link UnaryOperator} in a try-catch block.
      * <p>
-     * If {@code operator} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code operator} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code operator} is caught too.
-     * Wrapper then returns empty {@link Optional} unless {@link #handle(Throwable)} requests a rethrow.
+     * Wrapper then returns empty {@link Optional} unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().fromUnaryOperator(o -> my_throwing_lambda).orElse(fallback)}
-     * 
+     *
      * @param <T>
      *            see {@link UnaryOperator}
      * @param operator
@@ -1264,7 +1264,7 @@ public abstract class ExceptionHandler {
      * @see Exceptions
      */
     public final <T> OptionalUnaryOperator<T> fromUnaryOperator(UnaryOperator<T> operator) {
-        return new CatchingUnaryOperator<T>(operator);
+        return new CatchingUnaryOperator<>(operator);
     }
     private final class CatchingUnaryOperator<T> implements OptionalUnaryOperator<T> {
         private final UnaryOperator<T> operator;
@@ -1275,7 +1275,7 @@ public abstract class ExceptionHandler {
         public Optional<T> apply(T operand) {
             try {
                 return Optional.ofNullable(operator.apply(operand));
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 if (!handle(exception))
                     throw exception;
                 return Optional.empty();
@@ -1285,13 +1285,13 @@ public abstract class ExceptionHandler {
     /**
      * Wraps {@link IntUnaryOperator} in a try-catch block.
      * <p>
-     * If {@code operator} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code operator} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code operator} is caught too.
-     * Wrapper then returns empty {@link OptionalInt} unless {@link #handle(Throwable)} requests a rethrow.
+     * Wrapper then returns empty {@link OptionalInt} unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().fromIntUnaryOperator(o -> my_throwing_lambda).orElse(fallback)}
-     * 
+     *
      * @param operator
      *            the {@link IntUnaryOperator} to wrap, usually a lambda
      * @return wrapper that runs {@code operator} in a try-catch block
@@ -1310,7 +1310,7 @@ public abstract class ExceptionHandler {
         public OptionalInt apply(int operand) {
             try {
                 return OptionalInt.of(operator.applyAsInt(operand));
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 if (!handle(exception))
                     throw exception;
                 return OptionalInt.empty();
@@ -1320,13 +1320,13 @@ public abstract class ExceptionHandler {
     /**
      * Wraps {@link LongUnaryOperator} in a try-catch block.
      * <p>
-     * If {@code operator} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code operator} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code operator} is caught too.
-     * Wrapper then returns empty {@link OptionalLong} unless {@link #handle(Throwable)} requests a rethrow.
+     * Wrapper then returns empty {@link OptionalLong} unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().fromLongUnaryOperator(o -> my_throwing_lambda).orElse(fallback)}
-     * 
+     *
      * @param operator
      *            the {@link LongUnaryOperator} to wrap, usually a lambda
      * @return wrapper that runs {@code operator} in a try-catch block
@@ -1345,7 +1345,7 @@ public abstract class ExceptionHandler {
         public OptionalLong apply(long operand) {
             try {
                 return OptionalLong.of(operator.applyAsLong(operand));
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 if (!handle(exception))
                     throw exception;
                 return OptionalLong.empty();
@@ -1355,13 +1355,13 @@ public abstract class ExceptionHandler {
     /**
      * Wraps {@link DoubleUnaryOperator} in a try-catch block.
      * <p>
-     * If {@code operator} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code operator} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code operator} is caught too.
-     * Wrapper then returns empty {@link OptionalDouble} unless {@link #handle(Throwable)} requests a rethrow.
+     * Wrapper then returns empty {@link OptionalDouble} unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().fromDoubleUnaryOperator(o -> my_throwing_lambda).orElse(fallback)}
-     * 
+     *
      * @param operator
      *            the {@link DoubleUnaryOperator} to wrap, usually a lambda
      * @return wrapper that runs {@code operator} in a try-catch block
@@ -1380,7 +1380,7 @@ public abstract class ExceptionHandler {
         public OptionalDouble apply(double operand) {
             try {
                 return OptionalDouble.of(operator.applyAsDouble(operand));
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 if (!handle(exception))
                     throw exception;
                 return OptionalDouble.empty();
@@ -1390,13 +1390,13 @@ public abstract class ExceptionHandler {
     /**
      * Wraps {@link BiFunction} in a try-catch block.
      * <p>
-     * If {@code function} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code function} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code function} is caught too.
-     * Wrapper then returns empty {@link Optional} unless {@link #handle(Throwable)} requests a rethrow.
+     * Wrapper then returns empty {@link Optional} unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().fromBiFunction((t, u) -> my_throwing_lambda).orElse(fallback)}
-     * 
+     *
      * @param <T>
      *            see {@link BiFunction}
      * @param <U>
@@ -1410,7 +1410,7 @@ public abstract class ExceptionHandler {
      * @see Exceptions
      */
     public final <T, U, R> OptionalBiFunction<T, U, R> fromBiFunction(BiFunction<T, U, R> function) {
-        return new CatchingBiFunction<T, U, R>(function);
+        return new CatchingBiFunction<>(function);
     }
     private final class CatchingBiFunction<T, U, R> implements OptionalBiFunction<T, U, R> {
         private final BiFunction<T, U, R> function;
@@ -1421,7 +1421,7 @@ public abstract class ExceptionHandler {
         public Optional<R> apply(T t, U u) {
             try {
                 return Optional.ofNullable(function.apply(t, u));
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 if (!handle(exception))
                     throw exception;
                 return Optional.empty();
@@ -1431,13 +1431,13 @@ public abstract class ExceptionHandler {
     /**
      * Wraps {@link ToIntBiFunction} in a try-catch block.
      * <p>
-     * If {@code function} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code function} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code function} is caught too.
-     * Wrapper then returns empty {@link OptionalInt} unless {@link #handle(Throwable)} requests a rethrow.
+     * Wrapper then returns empty {@link OptionalInt} unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().fromToIntBiFunction((t, u) -> my_throwing_lambda).orElse(fallback)}
-     * 
+     *
      * @param <T>
      *            see {@link ToIntBiFunction}
      * @param <U>
@@ -1449,7 +1449,7 @@ public abstract class ExceptionHandler {
      * @see Exceptions
      */
     public final <T, U> OptionalToIntBiFunction<T, U> fromToIntBiFunction(ToIntBiFunction<T, U> function) {
-        return new CatchingToIntBiFunction<T, U>(function);
+        return new CatchingToIntBiFunction<>(function);
     }
     private final class CatchingToIntBiFunction<T, U> implements OptionalToIntBiFunction<T, U> {
         private final ToIntBiFunction<T, U> function;
@@ -1460,7 +1460,7 @@ public abstract class ExceptionHandler {
         public OptionalInt apply(T t, U u) {
             try {
                 return OptionalInt.of(function.applyAsInt(t, u));
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 if (!handle(exception))
                     throw exception;
                 return OptionalInt.empty();
@@ -1470,13 +1470,13 @@ public abstract class ExceptionHandler {
     /**
      * Wraps {@link ToLongBiFunction} in a try-catch block.
      * <p>
-     * If {@code function} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code function} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code function} is caught too.
-     * Wrapper then returns empty {@link OptionalLong} unless {@link #handle(Throwable)} requests a rethrow.
+     * Wrapper then returns empty {@link OptionalLong} unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().fromToLongBiFunction((t, u) -> my_throwing_lambda).orElse(fallback)}
-     * 
+     *
      * @param <T>
      *            see {@link ToLongBiFunction}
      * @param <U>
@@ -1488,7 +1488,7 @@ public abstract class ExceptionHandler {
      * @see Exceptions
      */
     public final <T, U> OptionalToLongBiFunction<T, U> fromToLongBiFunction(ToLongBiFunction<T, U> function) {
-        return new CatchingToLongBiFunction<T, U>(function);
+        return new CatchingToLongBiFunction<>(function);
     }
     private final class CatchingToLongBiFunction<T, U> implements OptionalToLongBiFunction<T, U> {
         private final ToLongBiFunction<T, U> function;
@@ -1499,7 +1499,7 @@ public abstract class ExceptionHandler {
         public OptionalLong apply(T t, U u) {
             try {
                 return OptionalLong.of(function.applyAsLong(t, u));
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 if (!handle(exception))
                     throw exception;
                 return OptionalLong.empty();
@@ -1509,13 +1509,13 @@ public abstract class ExceptionHandler {
     /**
      * Wraps {@link ToDoubleBiFunction} in a try-catch block.
      * <p>
-     * If {@code function} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code function} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code function} is caught too.
-     * Wrapper then returns empty {@link OptionalDouble} unless {@link #handle(Throwable)} requests a rethrow.
+     * Wrapper then returns empty {@link OptionalDouble} unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().fromToDoubleBiFunction((t, u) -> my_throwing_lambda).orElse(fallback)}
-     * 
+     *
      * @param <T>
      *            see {@link ToDoubleBiFunction}
      * @param <U>
@@ -1527,7 +1527,7 @@ public abstract class ExceptionHandler {
      * @see Exceptions
      */
     public final <T, U> OptionalToDoubleBiFunction<T, U> fromToDoubleBiFunction(ToDoubleBiFunction<T, U> function) {
-        return new CatchingToDoubleBiFunction<T, U>(function);
+        return new CatchingToDoubleBiFunction<>(function);
     }
     private final class CatchingToDoubleBiFunction<T, U> implements OptionalToDoubleBiFunction<T, U> {
         private final ToDoubleBiFunction<T, U> function;
@@ -1538,7 +1538,7 @@ public abstract class ExceptionHandler {
         public OptionalDouble apply(T t, U u) {
             try {
                 return OptionalDouble.of(function.applyAsDouble(t, u));
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 if (!handle(exception))
                     throw exception;
                 return OptionalDouble.empty();
@@ -1548,13 +1548,13 @@ public abstract class ExceptionHandler {
     /**
      * Wraps {@link BinaryOperator} in a try-catch block.
      * <p>
-     * If {@code operator} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code operator} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code operator} is caught too.
-     * Wrapper then returns empty {@link Optional} unless {@link #handle(Throwable)} requests a rethrow.
+     * Wrapper then returns empty {@link Optional} unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().fromBinaryOperator((l, r) -> my_throwing_lambda).orElse(fallback)}
-     * 
+     *
      * @param <T>
      *            see {@link BinaryOperator}
      * @param operator
@@ -1564,7 +1564,7 @@ public abstract class ExceptionHandler {
      * @see Exceptions
      */
     public final <T> OptionalBinaryOperator<T> fromBinaryOperator(BinaryOperator<T> operator) {
-        return new CatchingBinaryOperator<T>(operator);
+        return new CatchingBinaryOperator<>(operator);
     }
     private final class CatchingBinaryOperator<T> implements OptionalBinaryOperator<T> {
         private final BinaryOperator<T> operator;
@@ -1575,7 +1575,7 @@ public abstract class ExceptionHandler {
         public Optional<T> apply(T left, T right) {
             try {
                 return Optional.ofNullable(operator.apply(left, right));
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 if (!handle(exception))
                     throw exception;
                 return Optional.empty();
@@ -1585,13 +1585,13 @@ public abstract class ExceptionHandler {
     /**
      * Wraps {@link IntBinaryOperator} in a try-catch block.
      * <p>
-     * If {@code operator} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code operator} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code operator} is caught too.
-     * Wrapper then returns empty {@link OptionalInt} unless {@link #handle(Throwable)} requests a rethrow.
+     * Wrapper then returns empty {@link OptionalInt} unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().fromIntBinaryOperator((l, r) -> my_throwing_lambda).orElse(fallback)}
-     * 
+     *
      * @param operator
      *            the {@link IntBinaryOperator} to wrap, usually a lambda
      * @return wrapper that runs {@code operator} in a try-catch block
@@ -1610,7 +1610,7 @@ public abstract class ExceptionHandler {
         public OptionalInt apply(int left, int right) {
             try {
                 return OptionalInt.of(operator.applyAsInt(left, right));
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 if (!handle(exception))
                     throw exception;
                 return OptionalInt.empty();
@@ -1620,13 +1620,13 @@ public abstract class ExceptionHandler {
     /**
      * Wraps {@link LongBinaryOperator} in a try-catch block.
      * <p>
-     * If {@code operator} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code operator} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code operator} is caught too.
-     * Wrapper then returns empty {@link OptionalLong} unless {@link #handle(Throwable)} requests a rethrow.
+     * Wrapper then returns empty {@link OptionalLong} unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().fromLongBinaryOperator((l, r) -> my_throwing_lambda).orElse(fallback)}
-     * 
+     *
      * @param operator
      *            the {@link LongBinaryOperator} to wrap, usually a lambda
      * @return wrapper that runs {@code operator} in a try-catch block
@@ -1645,7 +1645,7 @@ public abstract class ExceptionHandler {
         public OptionalLong apply(long left, long right) {
             try {
                 return OptionalLong.of(operator.applyAsLong(left, right));
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 if (!handle(exception))
                     throw exception;
                 return OptionalLong.empty();
@@ -1655,13 +1655,13 @@ public abstract class ExceptionHandler {
     /**
      * Wraps {@link DoubleBinaryOperator} in a try-catch block.
      * <p>
-     * If {@code operator} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code operator} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code operator} is caught too.
-     * Wrapper then returns empty {@link OptionalDouble} unless {@link #handle(Throwable)} requests a rethrow.
+     * Wrapper then returns empty {@link OptionalDouble} unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().fromDoubleBinaryOperator((l, r) -> my_throwing_lambda).orElse(fallback)}
-     * 
+     *
      * @param operator
      *            the {@link DoubleBinaryOperator} to wrap, usually a lambda
      * @return wrapper that runs {@code operator} in a try-catch block
@@ -1680,7 +1680,7 @@ public abstract class ExceptionHandler {
         public OptionalDouble apply(double left, double right) {
             try {
                 return OptionalDouble.of(operator.applyAsDouble(left, right));
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 if (!handle(exception))
                     throw exception;
                 return OptionalDouble.empty();
@@ -1690,13 +1690,13 @@ public abstract class ExceptionHandler {
     /**
      * Wraps {@link Comparator} in a try-catch block.
      * <p>
-     * If {@code comparator} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code comparator} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code comparator} is caught too.
-     * Wrapper then returns empty {@link OptionalInt} unless {@link #handle(Throwable)} requests a rethrow.
+     * Wrapper then returns empty {@link OptionalInt} unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().comparator((l, r) -> my_throwing_lambda).orElse(fallback)}
-     * 
+     *
      * @param <T>
      *            see {@link Comparator}
      * @param comparator
@@ -1706,7 +1706,7 @@ public abstract class ExceptionHandler {
      * @see Exceptions
      */
     public final <T> OptionalComparator<T> comparator(Comparator<T> comparator) {
-        return new CatchingComparator<T>(comparator);
+        return new CatchingComparator<>(comparator);
     }
     private final class CatchingComparator<T> implements OptionalComparator<T> {
         private final Comparator<T> comparator;
@@ -1717,7 +1717,7 @@ public abstract class ExceptionHandler {
         public OptionalInt compare(T left, T right) {
             try {
                 return OptionalInt.of(comparator.compare(left, right));
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 if (!handle(exception))
                     throw exception;
                 return OptionalInt.empty();
@@ -1727,13 +1727,13 @@ public abstract class ExceptionHandler {
     /**
      * Wraps {@link CloseableScope} in a try-catch block.
      * <p>
-     * If {@code closeable} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code closeable} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code closeable} is caught too.
-     * Wrapper then completes normally unless {@link #handle(Throwable)} requests a rethrow.
+     * Wrapper then completes normally unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code try (var scope = Exceptions.silence().closeable(openSomething()))}
-     * 
+     *
      * @param closeable
      *            the {@link CloseableScope} to wrap
      * @return wrapper that runs {@code closeable} in a try-catch block
@@ -1752,7 +1752,7 @@ public abstract class ExceptionHandler {
         public void close() {
             try {
                 closeable.close();
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 if (!handle(exception))
                     throw exception;
             }
@@ -1761,13 +1761,13 @@ public abstract class ExceptionHandler {
     /**
      * Runs {@link Runnable} in a try-catch block.
      * <p>
-     * If {@code runnable} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code runnable} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code runnable} is caught too.
-     * This method then completes normally unless {@link #handle(Throwable)} requests a rethrow.
+     * This method then completes normally unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().run(() -> my_throwing_lambda)}
-     * 
+     *
      * @param runnable
      *            the {@link Runnable} to run, usually a lambda
      * @see <a href="https://noexception.machinezoo.com/">Tutorial</a>
@@ -1776,7 +1776,7 @@ public abstract class ExceptionHandler {
     public final void run(Runnable runnable) {
         try {
             runnable.run();
-        } catch (Throwable exception) {
+        } catch (Exception exception) {
             if (!handle(exception))
                 throw exception;
         }
@@ -1784,13 +1784,13 @@ public abstract class ExceptionHandler {
     /**
      * Runs {@link Supplier} in a try-catch block.
      * <p>
-     * If {@code supplier} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code supplier} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code supplier} is caught too.
-     * This method then returns empty {@link Optional} unless {@link #handle(Throwable)} requests a rethrow.
+     * This method then returns empty {@link Optional} unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().get(() -> my_throwing_lambda)}
-     * 
+     *
      * @param <T>
      *            see {@link Supplier}
      * @param supplier
@@ -1802,7 +1802,7 @@ public abstract class ExceptionHandler {
     public final <T> Optional<T> get(Supplier<T> supplier) {
         try {
             return Optional.ofNullable(supplier.get());
-        } catch (Throwable exception) {
+        } catch (Exception exception) {
             if (!handle(exception))
                 throw exception;
             return Optional.empty();
@@ -1811,13 +1811,13 @@ public abstract class ExceptionHandler {
     /**
      * Runs {@link IntSupplier} in a try-catch block.
      * <p>
-     * If {@code supplier} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code supplier} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code supplier} is caught too.
-     * This method then returns empty {@link OptionalInt} unless {@link #handle(Throwable)} requests a rethrow.
+     * This method then returns empty {@link OptionalInt} unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().getAsInt(() -> my_throwing_lambda)}
-     * 
+     *
      * @param supplier
      *            the {@link IntSupplier} to run, usually a lambda
      * @return an {@link OptionalInt} carrying {@code supplier} result or an empty {@link OptionalInt} if exception was caught
@@ -1827,7 +1827,7 @@ public abstract class ExceptionHandler {
     public final OptionalInt getAsInt(IntSupplier supplier) {
         try {
             return OptionalInt.of(supplier.getAsInt());
-        } catch (Throwable exception) {
+        } catch (Exception exception) {
             if (!handle(exception))
                 throw exception;
             return OptionalInt.empty();
@@ -1836,13 +1836,13 @@ public abstract class ExceptionHandler {
     /**
      * Runs {@link LongSupplier} in a try-catch block.
      * <p>
-     * If {@code supplier} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code supplier} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code supplier} is caught too.
-     * This method then returns empty {@link OptionalLong} unless {@link #handle(Throwable)} requests a rethrow.
+     * This method then returns empty {@link OptionalLong} unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().getAsLong(() -> my_throwing_lambda)}
-     * 
+     *
      * @param supplier
      *            the {@link LongSupplier} to run, usually a lambda
      * @return an {@link OptionalLong} carrying {@code supplier} result or an empty {@link OptionalLong} if exception was caught
@@ -1852,7 +1852,7 @@ public abstract class ExceptionHandler {
     public final OptionalLong getAsLong(LongSupplier supplier) {
         try {
             return OptionalLong.of(supplier.getAsLong());
-        } catch (Throwable exception) {
+        } catch (Exception exception) {
             if (!handle(exception))
                 throw exception;
             return OptionalLong.empty();
@@ -1861,13 +1861,13 @@ public abstract class ExceptionHandler {
     /**
      * Runs {@link DoubleSupplier} in a try-catch block.
      * <p>
-     * If {@code supplier} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code supplier} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code supplier} is caught too.
-     * This method then returns empty {@link OptionalDouble} unless {@link #handle(Throwable)} requests a rethrow.
+     * This method then returns empty {@link OptionalDouble} unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().getAsDouble(() -> my_throwing_lambda)}
-     * 
+     *
      * @param supplier
      *            the {@link DoubleSupplier} to run, usually a lambda
      * @return an {@link OptionalDouble} carrying {@code supplier} result or an empty {@link OptionalDouble} if exception was caught
@@ -1877,7 +1877,7 @@ public abstract class ExceptionHandler {
     public final OptionalDouble getAsDouble(DoubleSupplier supplier) {
         try {
             return OptionalDouble.of(supplier.getAsDouble());
-        } catch (Throwable exception) {
+        } catch (Exception exception) {
             if (!handle(exception))
                 throw exception;
             return OptionalDouble.empty();
@@ -1886,13 +1886,13 @@ public abstract class ExceptionHandler {
     /**
      * Runs {@link BooleanSupplier} in a try-catch block.
      * <p>
-     * If {@code supplier} throws, the exception is caught and passed to {@link #handle(Throwable)},
+     * If {@code supplier} throws, the exception is caught and passed to {@link #handle(Exception)},
      * which applies exception handling policy (silence, propagate, log, custom).
      * {@link NullPointerException} from {@code null} {@code supplier} is caught too.
-     * This method then returns empty {@link OptionalBoolean} unless {@link #handle(Throwable)} requests a rethrow.
+     * This method then returns empty {@link OptionalBoolean} unless {@link #handle(Exception)} requests a rethrow.
      * <p>
      * Typical usage: {@code Exceptions.silence().getAsBoolean(() -> my_throwing_lambda)}
-     * 
+     *
      * @param supplier
      *            the {@link BooleanSupplier} to run, usually a lambda
      * @return an {@link OptionalBoolean} carrying {@code supplier} result or an empty {@link OptionalBoolean} if exception was caught
@@ -1902,7 +1902,7 @@ public abstract class ExceptionHandler {
     public final OptionalBoolean getAsBoolean(BooleanSupplier supplier) {
         try {
             return OptionalBoolean.of(supplier.getAsBoolean());
-        } catch (Throwable exception) {
+        } catch (Exception exception) {
             if (!handle(exception))
                 throw exception;
             return OptionalBoolean.empty();

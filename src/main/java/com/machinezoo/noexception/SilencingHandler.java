@@ -3,7 +3,7 @@ package com.machinezoo.noexception;
 
 final class SilencingHandler extends ExceptionHandler {
 	@Override
-	public boolean handle(Throwable exception) {
+	public boolean handle(Exception exception) {
 		if (exception instanceof InterruptedException)
 			Thread.currentThread().interrupt();
 		return true;

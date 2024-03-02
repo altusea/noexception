@@ -10,7 +10,7 @@ import com.machinezoo.noexception.*;
  * {@code ThrowingToIntBiFunction} is usually implemented by a lambda
  * and passed to {@link CheckedExceptionHandler#fromToIntBiFunction(ThrowingToIntBiFunction)}.
  * See <a href="https://noexception.machinezoo.com/">noexception tutorial</a>.
- * 
+ *
  * @param <T>
  *            see {@link ToIntBiFunction}
  * @param <U>
@@ -22,16 +22,16 @@ import com.machinezoo.noexception.*;
 public interface ThrowingToIntBiFunction<T, U> {
     /**
      * Variation of {@link ToIntBiFunction#applyAsInt(Object, Object)} that allows throwing checked exceptions.
-     * 
+     *
      * @param t
      *            see {@link ToIntBiFunction#applyAsInt(Object, Object)}
      * @param u
      *            see {@link ToIntBiFunction#applyAsInt(Object, Object)}
      * @return see {@link ToIntBiFunction#applyAsInt(Object, Object)}
-     * @throws Throwable
+     * @throws Exception
      *             if unable to complete
      * @see CheckedExceptionHandler#fromToIntBiFunction(ThrowingToIntBiFunction)
      * @see ToIntBiFunction#applyAsInt(Object, Object)
      */
-    int applyAsInt(T t, U u) throws Throwable;
+    int applyAsInt(T t, U u) throws Exception;
 }

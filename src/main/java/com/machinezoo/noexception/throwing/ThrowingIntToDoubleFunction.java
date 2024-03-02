@@ -10,7 +10,7 @@ import com.machinezoo.noexception.*;
  * {@code ThrowingIntToDoubleFunction} is usually implemented by a lambda
  * and passed to {@link CheckedExceptionHandler#fromIntToDoubleFunction(ThrowingIntToDoubleFunction)}.
  * See <a href="https://noexception.machinezoo.com/">noexception tutorial</a>.
- * 
+ *
  * @see CheckedExceptionHandler#fromIntToDoubleFunction(ThrowingIntToDoubleFunction)
  * @see IntToDoubleFunction
  */
@@ -18,14 +18,14 @@ import com.machinezoo.noexception.*;
 public interface ThrowingIntToDoubleFunction {
     /**
      * Variation of {@link IntToDoubleFunction#applyAsDouble(int)} that allows throwing checked exceptions.
-     * 
+     *
      * @param value
      *            see {@link IntToDoubleFunction#applyAsDouble(int)}
      * @return see {@link IntToDoubleFunction#applyAsDouble(int)}
-     * @throws Throwable
+     * @throws Exception
      *             if unable to complete
      * @see CheckedExceptionHandler#fromIntToDoubleFunction(ThrowingIntToDoubleFunction)
      * @see IntToDoubleFunction#applyAsDouble(int)
      */
-    double applyAsDouble(int value) throws Throwable;
+    double applyAsDouble(int value) throws Exception;
 }

@@ -7,7 +7,7 @@ class PassingFilter extends ExceptionFilter {
 		this.handler = handler;
 	}
 	@Override
-	public void handle(Throwable exception) {
+	public void handle(Exception exception) {
 		handler.handle(exception);
 	}
 }
